@@ -3,18 +3,23 @@ import { useEffect, useState } from 'react'
 import ControllerConnector from '@cartridge/connector/controller'
 import { Button } from '@cartridge/ui-next'
  
-export function ConnectWallet() {
-  const { connect, connectors } = useConnect()
-  const { disconnect } = useDisconnect()
-  const { address } = useAccount()
-  const controller = connectors[0] as ControllerConnector
-  const [username, setUsername] = useState<string>()
- 
+type ConnectWalletProps = {
+  setController: (controller: ControllerConnector) => void;
+};
+
+export function ConnectWallet({ setController }: ConnectWalletProps) {
+  const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { address } = useAccount();
+  const controller = connectors[0] as ControllerConnector;
+  const [username, setUsername] = useState<string>();
+
   useEffect(() => {
-    if (!address) return
-    controller.username()?.then((n) => setUsername(n))
-  }, [address, controller])
- 
+    if (!address) return;
+    controller.username()?.then((n) => setUsername(n));
+    setController(controller); 
+  }, [address, controller, setController]);
+
   return (
     <div>
       {address && (
@@ -24,12 +29,10 @@ export function ConnectWallet() {
         </>
       )}
       {address ? (
-        <Button onClick={() => disconnect()}>Disconnect</Button>
+        <button onClick={() => disconnect()}>Disconnect</button>
       ) : (
-        <Button onClick={() => connect({ connector: controller })}>
-          Connect
-        </Button>
+        <button onClick={() => connect({ connector: controller })}>Connect</button>
       )}
     </div>
-  )
+  );
 }
