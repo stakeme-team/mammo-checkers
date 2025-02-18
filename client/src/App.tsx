@@ -1,3 +1,4 @@
+import React from "react";
 import { StarknetProvider } from "./context/StarknetProvider";
 import { ConnectWallet } from "./components/ConnectWallet";
 import { Spawn } from "./components/Spawn";
