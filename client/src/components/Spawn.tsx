@@ -1,3 +1,4 @@
+import React from "react";
 import { useCallback, useState, useEffect } from "react";
 import { ControllerConnector } from "@cartridge/connector";
 import { RpcProvider } from "starknet";
@@ -42,8 +43,8 @@ type SpawnProps = {
 
       const result = await account.execute([
         {
-          contractAddress: "0x044b8cd097c84503c21a597e0370fd371b47e6f30de07db42e0bedd3fadf2420",
-          entrypoint: "create_lobby",
+          contractAddress: "0x062f6a8b1bc8f4b45985eaff3b00f85f370d6eb8dcb038072f3bf34fba0dd855",
+          entrypoint: "spawn",
           calldata: [],
         },
       ]);
