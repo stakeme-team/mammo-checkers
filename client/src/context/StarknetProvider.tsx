@@ -7,7 +7,7 @@ import {constants, RpcProvider} from "starknet";
 import {SessionPolicies} from "@cartridge/controller";
 
 
-const WORLD_ADDRESS = '0x525177c8afe8680d7ad1da30ca183e482cfcd6404c1e09d83fd3fa2994fd4b8'
+const WORLD_ADDRESS = '0x044b8cd097c84503c21a597e0370fd371b47e6f30de07db42e0bedd3fadf2420'
 
 const policies: SessionPolicies = {
     contracts: {
