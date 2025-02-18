@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect } from "react";
-import { useDojo } from "../hooks/useDojo.tsx";
 import { ControllerConnector } from "@cartridge/connector";
 import { RpcProvider } from "starknet";
 
@@ -8,10 +7,9 @@ type SpawnProps = {
   provider: RpcProvider; 
 };
 
-export const Spawn = ({ controller, provider }: SpawnProps) => {
+  export const Spawn = ({ controller, provider }: SpawnProps) => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [account, setAccount] = useState<any>(null);
-  const { setupWorld } = useDojo();
 
   useEffect(() => {
     async function fetchAccount() {
@@ -42,15 +40,14 @@ export const Spawn = ({ controller, provider }: SpawnProps) => {
 
       setSubmitted(true);
 
-      console.log("Executing transaction with account:", account);
-
-      await account.execute([
+      const result = await account.execute([
         {
           contractAddress: "0x044b8cd097c84503c21a597e0370fd371b47e6f30de07db42e0bedd3fadf2420",
           entrypoint: "create_lobby",
           calldata: [],
         },
       ]);
+      console.log(result)
 
     } catch (e) {
       console.error("Transaction failed:", e);
