@@ -1,7 +1,6 @@
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 import { useEffect, useState } from 'react'
 import ControllerConnector from '@cartridge/connector/controller'
-import { Button } from '@cartridge/ui-next'
  
 type ConnectWalletProps = {
   setController: (controller: ControllerConnector) => void;
