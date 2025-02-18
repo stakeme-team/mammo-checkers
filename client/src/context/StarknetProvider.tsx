@@ -7,12 +7,13 @@ import {constants, RpcProvider} from "starknet";
 import {SessionPolicies} from "@cartridge/controller";
 
 
-const ETH_TOKEN_ADDRESS = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7'
+const WORLD_ADDRESS = '0x525177c8afe8680d7ad1da30ca183e482cfcd6404c1e09d83fd3fa2994fd4b8'
 
 const policies: SessionPolicies = {
     contracts: {
-        [ETH_TOKEN_ADDRESS]: {
+        [WORLD_ADDRESS]: {
             methods: [
+                {name: "create_lobby", entrypoint: "create_lobby"},
             ],
         },
     }
@@ -30,7 +31,7 @@ export const connector = new ControllerConnector({
 
 function provider() {
     return new RpcProvider({
-        nodeUrl: "https://api.cartridge.gg/x/checkers-scaffold-1/katana",
+        nodeUrl: "https://api.cartridge.gg/x/testBrentimus/katana",
     });
 }
 
