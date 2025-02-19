@@ -13,10 +13,10 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const provider = new RpcProvider({ nodeUrl: "https://api.cartridge.gg/x/testBrentimus/katana" });
   const { unityProvider } = useUnityContext({
-    loaderUrl: "build/loader.js",
-    dataUrl: "build/data.unityweb",
-    frameworkUrl: "build/framework.js.unityweb",
-    codeUrl: "build/wasm.unityweb",
+    loaderUrl: "build/checkers.loader.js",
+    dataUrl: "build/checkers.data.unityweb",
+    frameworkUrl: "build/checkers.framework.js.unityweb",
+    codeUrl: "build/checkers.wasm.unityweb",
   }); 
 
   return (
