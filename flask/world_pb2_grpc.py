@@ -91,16 +91,6 @@ class WorldStub(object):
                 request_serializer=world__pb2.UpdateTokenBalancesSubscriptionRequest.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
-        self.SubscribeTokens = channel.unary_stream(
-                '/world.World/SubscribeTokens',
-                request_serializer=world__pb2.RetrieveTokensRequest.SerializeToString,
-                response_deserializer=world__pb2.SubscribeTokensResponse.FromString,
-                _registered_method=True)
-        self.UpdateTokensSubscription = channel.unary_unary(
-                '/world.World/UpdateTokensSubscription',
-                request_serializer=world__pb2.UpdateTokenSubscriptionRequest.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                _registered_method=True)
         self.RetrieveEventMessages = channel.unary_unary(
                 '/world.World/RetrieveEventMessages',
                 request_serializer=world__pb2.RetrieveEventMessagesRequest.SerializeToString,
@@ -125,11 +115,6 @@ class WorldStub(object):
                 '/world.World/RetrieveTokenBalances',
                 request_serializer=world__pb2.RetrieveTokenBalancesRequest.SerializeToString,
                 response_deserializer=world__pb2.RetrieveTokenBalancesResponse.FromString,
-                _registered_method=True)
-        self.RetrieveControllers = channel.unary_unary(
-                '/world.World/RetrieveControllers',
-                request_serializer=world__pb2.RetrieveControllersRequest.SerializeToString,
-                response_deserializer=world__pb2.RetrieveControllersResponse.FromString,
                 _registered_method=True)
 
 
@@ -214,20 +199,6 @@ class WorldServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def SubscribeTokens(self, request, context):
-        """Subscribe to token updates.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def UpdateTokensSubscription(self, request, context):
-        """Update token subscription
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def RetrieveEventMessages(self, request, context):
         """Retrieve entities
         """
@@ -258,13 +229,6 @@ class WorldServicer(object):
 
     def RetrieveTokenBalances(self, request, context):
         """Retrieve token balances
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def RetrieveControllers(self, request, context):
-        """Retrieve controllers
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -328,16 +292,6 @@ def add_WorldServicer_to_server(servicer, server):
                     request_deserializer=world__pb2.UpdateTokenBalancesSubscriptionRequest.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
-            'SubscribeTokens': grpc.unary_stream_rpc_method_handler(
-                    servicer.SubscribeTokens,
-                    request_deserializer=world__pb2.RetrieveTokensRequest.FromString,
-                    response_serializer=world__pb2.SubscribeTokensResponse.SerializeToString,
-            ),
-            'UpdateTokensSubscription': grpc.unary_unary_rpc_method_handler(
-                    servicer.UpdateTokensSubscription,
-                    request_deserializer=world__pb2.UpdateTokenSubscriptionRequest.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            ),
             'RetrieveEventMessages': grpc.unary_unary_rpc_method_handler(
                     servicer.RetrieveEventMessages,
                     request_deserializer=world__pb2.RetrieveEventMessagesRequest.FromString,
@@ -362,11 +316,6 @@ def add_WorldServicer_to_server(servicer, server):
                     servicer.RetrieveTokenBalances,
                     request_deserializer=world__pb2.RetrieveTokenBalancesRequest.FromString,
                     response_serializer=world__pb2.RetrieveTokenBalancesResponse.SerializeToString,
-            ),
-            'RetrieveControllers': grpc.unary_unary_rpc_method_handler(
-                    servicer.RetrieveControllers,
-                    request_deserializer=world__pb2.RetrieveControllersRequest.FromString,
-                    response_serializer=world__pb2.RetrieveControllersResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -678,60 +627,6 @@ class World(object):
             _registered_method=True)
 
     @staticmethod
-    def SubscribeTokens(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_stream(
-            request,
-            target,
-            '/world.World/SubscribeTokens',
-            world__pb2.RetrieveTokensRequest.SerializeToString,
-            world__pb2.SubscribeTokensResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def UpdateTokensSubscription(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/world.World/UpdateTokensSubscription',
-            world__pb2.UpdateTokenSubscriptionRequest.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
     def RetrieveEventMessages(request,
             target,
             options=(),
@@ -856,33 +751,6 @@ class World(object):
             '/world.World/RetrieveTokenBalances',
             world__pb2.RetrieveTokenBalancesRequest.SerializeToString,
             world__pb2.RetrieveTokenBalancesResponse.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def RetrieveControllers(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/world.World/RetrieveControllers',
-            world__pb2.RetrieveControllersRequest.SerializeToString,
-            world__pb2.RetrieveControllersResponse.FromString,
             options,
             channel_credentials,
             insecure,
