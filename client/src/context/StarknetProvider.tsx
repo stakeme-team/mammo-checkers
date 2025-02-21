@@ -8,13 +8,13 @@ import {RpcProvider} from "starknet";
 import {SessionPolicies} from "@cartridge/controller";
 
 
-const CONTRACT_ACTIONS = '0x062f6a8b1bc8f4b45985eaff3b00f85f370d6eb8dcb038072f3bf34fba0dd855'
+const CONTRACT_ACTIONS = '0x144dff36806782686e253f6b8b58103848391e14388ae9ac69fafe106c4991f'
 
 const policies: SessionPolicies = {
     contracts: {
         [CONTRACT_ACTIONS]: {
             methods: [
-                {name: "spawn", entrypoint: "spawn"},
+                {name: "join_queue", entrypoint: "join_queue"},
             ],
         },
     }
@@ -24,15 +24,15 @@ export const connector = new ControllerConnector({
     policies,
     chains: [
         {
-            rpcUrl: "https://api.cartridge.gg/x/testBrentimus/katana",
+            rpcUrl: "https://api.cartridge.gg/x/mammo-checkers/katana",
         },
     ],
-    defaultChainId: "0x57505f544553544252454e54494d5553",
+    defaultChainId: "0x57505f4d414d4d4f5f434845434b455253",
 }) as never as Connector;
 
 function provider() {
     return new RpcProvider({
-        nodeUrl: "https://api.cartridge.gg/x/testBrentimus/katana",
+        nodeUrl: "https://api.cartridge.gg/x/mammo-checkers/katana",
     });
 }
 

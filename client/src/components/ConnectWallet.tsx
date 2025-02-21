@@ -2,24 +2,20 @@ import React from "react";
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 import { useEffect, useState } from 'react'
 import ControllerConnector from '@cartridge/connector/controller'
+import { Button } from '@cartridge/ui-next'
  
-type ConnectWalletProps = {
-  setController: (controller: ControllerConnector) => void;
-};
-
-export function ConnectWallet({ setController }: ConnectWalletProps) {
-  const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
-  const { address } = useAccount();
-  const controller = connectors[0] as ControllerConnector;
-  const [username, setUsername] = useState<string>();
-
+export function ConnectWallet() {
+  const { connect, connectors } = useConnect()
+  const { disconnect } = useDisconnect()
+  const { address } = useAccount()
+  const controller = connectors[0] as ControllerConnector
+  const [username, setUsername] = useState<string>()
+ 
   useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setUsername(n));
-    setController(controller); 
-  }, [address, controller, setController]);
-
+    if (!address) return
+    controller.username()?.then((n) => setUsername(n))
+  }, [address, controller])
+ 
   return (
     <div>
       {address && (
@@ -29,10 +25,12 @@ export function ConnectWallet({ setController }: ConnectWalletProps) {
         </>
       )}
       {address ? (
-        <button onClick={() => disconnect()}>Disconnect</button>
+        <Button onClick={() => disconnect()}>Disconnect</Button>
       ) : (
-        <button onClick={() => connect({ connector: controller })}>Connect</button>
+        <Button onClick={() => connect({ connector: controller })}>
+          Connect
+        </Button>
       )}
     </div>
-  );
+  )
 }
