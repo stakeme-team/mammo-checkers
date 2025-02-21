@@ -1,8 +1,11 @@
 import subprocess
 import json
+import requests
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Разрешаем все CORS запросы
 
 def call_grpc(method, data=None):
     """
@@ -95,5 +98,108 @@ def retrieve_token_balances():
     data = request.get_json()
     return jsonify(call_grpc("RetrieveTokenBalances", data))
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+@app.route('/get-checkers-match', methods=['GET'])
+def get_checkers_match():
+    """
+    Получение матчей в шашки для указанного игрока через GraphQL.
+    """
+    player_address = request.args.get('playerAddress')
+    
+    if not player_address:
+        return jsonify({"error": "Missing playerAddress parameter"}), 400
+    
+    graphql_query = {
+        "query": """
+        query ($player: String!) {
+          myCheckersGameMatchModels(where: {player1IN: [$player], player2IN: [$player]}) {
+            edges {
+              node {
+                match_id
+                player1
+                player2
+                bet_amount
+                game_type
+                status
+                current_turn
+                chain_capture_in_progress
+                last_move_timestamp
+                move_count
+                winner
+              }
+            }
+          }
+        }
+        """,
+        "variables": {"player": player_address}
+    }
+    
+    try:
+        response = requests.post("http://127.0.0.1:8080/graphql", json=graphql_query)
+        data = response.json()
+        
+        # Проверяем, есть ли матчи для игрока
+        if not data['data']['myCheckersGameMatchModels']['edges']:
+            return jsonify({
+                "status": "not_found",
+                "message": "No matches found for this player"
+            }), 404
+        
+        # Если матчи найдены, возвращаем данные
+        return jsonify({
+            "status": "found",
+            "data": data['data']['myCheckersGameMatchModels']['edges']
+        })
+        
+    except requests.RequestException as e:
+        return jsonify({"error": "GraphQL request failed", "details": str(e)}), 500
+
+@app.route('/check-player-in-queue', methods=['GET'])
+def check_player_in_queue():
+    """
+    Проверка наличия игрока в очереди на матч.
+    """
+    player_address = request.args.get('playerAddress')
+    
+    if not player_address:
+        return jsonify({"error": "Missing playerAddress parameter"}), 400
+    
+    graphql_query = {
+        "query": """
+        query ($player: String!) {
+          myCheckersMatchQueueModels(where: {first_player: $player}) {
+            edges {
+              node {
+                queue_id
+                waiting_count
+                first_player
+                game_type
+              }
+            }
+          }
+        }
+        """,
+        "variables": {"player": player_address}
+    }
+    
+    try:
+        response = requests.post("http://127.0.0.1:8080/graphql", json=graphql_query)
+        data = response.json()
+        
+        # Проверяем, есть ли игрок в очереди
+        if not data['data']['myCheckersMatchQueueModels']['edges']:
+            return jsonify({
+                "status": "not_found",
+                "message": "Player is not in any match queue"
+            }), 404
+        
+        # Если игрок найден, возвращаем данные
+        return jsonify({
+            "status": "found",
+            "data": data['data']['myCheckersMatchQueueModels']['edges'][0]['node']
+        })
+        
+    except requests.RequestException as e:
+        return jsonify({"error": "GraphQL request failed", "details": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5000)

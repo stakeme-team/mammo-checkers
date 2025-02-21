@@ -12,6 +12,7 @@
   "dependencies": {
     "@cartridge/connector": "^0.6.0",
     "@cartridge/controller": "^0.6.0",
+    "@cartridge/ui-next": "^0.5.0-alpha.1",
     "@starknet-react/chains": "^3.1.2",
     "@starknet-react/core": "^3.7.2",
     "@vitejs/plugin-react": "^4.3.4",

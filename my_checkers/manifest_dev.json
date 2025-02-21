@@ -1,9 +1,9 @@
 {
   "world": {
-    "class_hash": "0x7c9469d45a9cdbab775035afb48e1fa73fb35ab059fcb9dfb0a301aa973e783",
-    "address": "0x65ee8188c171a836294feaa931f1c78b5f18957791c039e84ee40b4b3e85d3e",
+    "class_hash": "0x2361c106e790c1d1bff8c9f73c9d84e9e3ac94b2d8df6db4ddd55e82c33a9b4",
+    "address": "0x190386ce184452b6fed8ff0b17b4d42ea47cdf8a2d1f0a98be083f53b41662f",
     "seed": "dojo_starter",
-    "name": "Dojo starter",
+    "name": "Checkers",
     "entrypoints": [
       "uuid",
       "set_metadata",
@@ -11,7 +11,6 @@
       "register_event",
       "register_model",
       "register_contract",
-      "register_library",
       "init_contract",
       "upgrade_event",
       "upgrade_model",
@@ -79,10 +78,6 @@
           {
             "name": "Unregistered",
             "type": "()"
-          },
-          {
-            "name": "Library",
-            "type": "(core::starknet::class_hash::ClassHash, core::felt252)"
           }
         ]
       },
@@ -363,34 +358,6 @@
             "outputs": [
               {
                 "type": "core::starknet::contract_address::ContractAddress"
-              }
-            ],
-            "state_mutability": "external"
-          },
-          {
-            "type": "function",
-            "name": "register_library",
-            "inputs": [
-              {
-                "name": "namespace",
-                "type": "core::byte_array::ByteArray"
-              },
-              {
-                "name": "class_hash",
-                "type": "core::starknet::class_hash::ClassHash"
-              },
-              {
-                "name": "name",
-                "type": "core::byte_array::ByteArray"
-              },
-              {
-                "name": "version",
-                "type": "core::byte_array::ByteArray"
-              }
-            ],
-            "outputs": [
-              {
-                "type": "core::starknet::class_hash::ClassHash"
               }
             ],
             "state_mutability": "external"
@@ -1000,28 +967,6 @@
       },
       {
         "type": "event",
-        "name": "dojo::world::world_contract::world::LibraryRegistered",
-        "kind": "struct",
-        "members": [
-          {
-            "name": "name",
-            "type": "core::byte_array::ByteArray",
-            "kind": "key"
-          },
-          {
-            "name": "namespace",
-            "type": "core::byte_array::ByteArray",
-            "kind": "key"
-          },
-          {
-            "name": "class_hash",
-            "type": "core::starknet::class_hash::ClassHash",
-            "kind": "data"
-          }
-        ]
-      },
-      {
-        "type": "event",
         "name": "dojo::world::world_contract::world::EventEmitted",
         "kind": "struct",
         "members": [
@@ -1262,11 +1207,6 @@
             "kind": "nested"
           },
           {
-            "name": "LibraryRegistered",
-            "type": "dojo::world::world_contract::world::LibraryRegistered",
-            "kind": "nested"
-          },
-          {
             "name": "EventEmitted",
             "type": "dojo::world::world_contract::world::EventEmitted",
             "kind": "nested"
@@ -1312,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x62f6a8b1bc8f4b45985eaff3b00f85f370d6eb8dcb038072f3bf34fba0dd855",
-      "class_hash": "0x7e929027a6456c78b98bd4b54a4ab5db0058fae29e5c3a35d87aae49655236",
+      "address": "0x61db01335bf2b9518f278971dd05bb9be73cb73d66ca7a26d7957df3374d64",
+      "class_hash": "0x5966034ff1e1b1e965d4172384518725945dace262efef859ef2d7f4f8b3c26",
       "abi": [
         {
           "type": "impl",
@@ -1368,48 +1308,63 @@
         {
           "type": "impl",
           "name": "ActionsImpl",
-          "interface_name": "dojo_starter::systems::actions::IActions"
-        },
-        {
-          "type": "enum",
-          "name": "dojo_starter::models::Direction",
-          "variants": [
-            {
-              "name": "Left",
-              "type": "()"
-            },
-            {
-              "name": "Right",
-              "type": "()"
-            },
-            {
-              "name": "Up",
-              "type": "()"
-            },
-            {
-              "name": "Down",
-              "type": "()"
-            }
-          ]
+          "interface_name": "my_checkers::systems::actions::IActions"
         },
         {
           "type": "interface",
-          "name": "dojo_starter::systems::actions::IActions",
+          "name": "my_checkers::systems::actions::IActions",
           "items": [
             {
               "type": "function",
-              "name": "spawn",
-              "inputs": [],
+              "name": "make_move",
+              "inputs": [
+                {
+                  "name": "match_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "from_x",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "from_y",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "to_x",
+                  "type": "core::integer::u8"
+                },
+                {
+                  "name": "to_y",
+                  "type": "core::integer::u8"
+                }
+              ],
               "outputs": [],
               "state_mutability": "external"
             },
             {
               "type": "function",
-              "name": "move",
+              "name": "corner_make_moves",
               "inputs": [
                 {
-                  "name": "direction",
-                  "type": "dojo_starter::models::Direction"
+                  "name": "match_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "steps",
+                  "type": "core::array::Array::<(core::integer::u8, core::integer::u8, core::integer::u8, core::integer::u8)>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "offer_draw",
+              "inputs": [
+                {
+                  "name": "match_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1516,7 +1471,7 @@
         },
         {
           "type": "event",
-          "name": "dojo_starter::systems::actions::actions::Event",
+          "name": "my_checkers::systems::actions::actions::Event",
           "kind": "enum",
           "variants": [
             {
@@ -1533,43 +1488,261 @@
         }
       ],
       "init_calldata": [],
-      "tag": "dojo_starter-actions",
-      "selector": "0x7a1c71029f2d0b38e3ac89b09931d08b6e48417e079c289ff19a8698d0cba33",
+      "tag": "my_checkers-actions",
+      "selector": "0x78a20f6273e4b639071926df46a1583a364cdb2794eaf07ab48815461d3c81a",
       "systems": [
-        "spawn",
-        "move",
+        "make_move",
+        "corner_make_moves",
+        "offer_draw",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x144dff36806782686e253f6b8b58103848391e14388ae9ac69fafe106c4991f",
+      "class_hash": "0x6db7734af9e2aa1bcb6cf9f4d43fc234a82b515e55d7638d95d4e454c19ebd1",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "queue_system__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "queue_system__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "QueueSystemImpl",
+          "interface_name": "my_checkers::systems::queue_system::IQueueSystem"
+        },
+        {
+          "type": "enum",
+          "name": "my_checkers::models::enums::GameType",
+          "variants": [
+            {
+              "name": "CornerCheckers",
+              "type": "()"
+            },
+            {
+              "name": "ClassicCheckers",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "my_checkers::systems::queue_system::IQueueSystem",
+          "items": [
+            {
+              "type": "function",
+              "name": "join_queue",
+              "inputs": [
+                {
+                  "name": "game_type",
+                  "type": "my_checkers::models::enums::GameType"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "my_checkers::systems::queue_system::queue_system::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "my_checkers-queue_system",
+      "selector": "0x3f269b48984505d5fb6492f1fba58a96801397786d5cc39772d6d5ad0c54798",
+      "systems": [
+        "join_queue",
         "upgrade"
       ]
     }
   ],
-  "libraries": [],
   "models": [
     {
       "members": [],
-      "class_hash": "0x5dee089cbc4c8e6b4dbb08ee91ca9e275c5f5bb0be158ebae60ecd3b06989dd",
-      "tag": "dojo_starter-DirectionsAvailable",
-      "selector": "0x77844f1facb51e60e546a9832d56c6bd04fa23be4fd5b57290caae5e9a3c1e4"
+      "class_hash": "0x20c02c41571ae70f19d08adfb52590777d29ca05cd3203e8b43ca810d2f66af",
+      "tag": "my_checkers-BoardPiece",
+      "selector": "0x65cdd334be64b5fcddcc621442d9436dfbe0c3abeb42194cd24bc3a9d0389e1"
     },
     {
       "members": [],
-      "class_hash": "0x1a3faf9f018c2d792f06a9b52bd0b01b78bd652cb2dafbb3869f12814f0825b",
-      "tag": "dojo_starter-Moves",
-      "selector": "0x2a29373f1af8348bd366a990eb3a342ef2cbe5e85160539eaca3441a673f468"
+      "class_hash": "0xb1dbcedfd88efe0006bc6873da1fd881e760caf57bfbe52bb33df2df49e74c",
+      "tag": "my_checkers-GameMatch",
+      "selector": "0x6a3babdf2fed962da4893ecb469619845099bfb05dc9356089291d5fbc2a864"
     },
     {
       "members": [],
-      "class_hash": "0x6dd8181e9e5a571c80803ab2adde6141f030decdef460106d757aa083f26a70",
-      "tag": "dojo_starter-Position",
-      "selector": "0x2ac8b4c190f7031b9fc44312e6b047a1dce0b3f2957c33a935ca7846a46dd5b"
-    }
-  ],
-  "events": [
+      "class_hash": "0x7e8c81e54f2318b095745eefb4975f311aa05770cc4ab89b4888472c5ff9737",
+      "tag": "my_checkers-MatchIDCounter",
+      "selector": "0x22869b2f9d94f991de6167d53e6afb60b274665b747e33c923274a7dc523720"
+    },
     {
       "members": [],
-      "class_hash": "0xe7390da745519ad5484c14f6c32caef28e53ed496e78c086a0689bb2007112",
-      "tag": "dojo_starter-Moved",
-      "selector": "0x504403e5c02b6442527721fc464d9ea5fc8f1ee600ab5ccd5c0845d36fd45f1"
+      "class_hash": "0x4089ab6f9ccebbcee459c178acbbc925d58b6450e92d316d73e6dd581e81483",
+      "tag": "my_checkers-MatchQueue",
+      "selector": "0x22a018382c39238aa99d1ffd04625aa3de011cb45d8b509bfab8cb1959bc401"
+    },
+    {
+      "members": [],
+      "class_hash": "0x62dcb2c0f16ddef4fc3e5d2e8dff93aea58758cedd50194911dbd78997b06cd",
+      "tag": "my_checkers-Player",
+      "selector": "0x6068f974a8c89a275cddcbb46deecaef6e249efa03d27f63f1862dc649e2847"
     }
   ],
-  "external_contracts": []
+  "events": []
 }
