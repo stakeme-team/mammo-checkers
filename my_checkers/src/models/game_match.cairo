@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 use crate::models::enums::{GameType, GameStatus};
 
-#[derive(Copy, Drop, Debug, Serde)]
+#[derive(Copy, Drop, Debug, Serde, Introspect)]
 #[dojo::model]
 pub struct GameMatch {
     #[key]
@@ -24,4 +24,15 @@ pub struct GameMatch {
     pub winner: ContractAddress,
     // draw_offered_by_p1: bool,
     // draw_offered_by_p2: bool,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::event]
+pub struct MatchCreated {
+    #[key]
+    pub match_id: u32,
+    pub player1: ContractAddress,
+    pub player2: ContractAddress,
+    pub status: GameStatus,
+    pub game_type: GameType,
 }

@@ -11,10 +11,11 @@ pub mod queue_system {
     use starknet::{ContractAddress, get_caller_address, contract_address_const};
     use dojo::world::WorldStorage;
     use dojo::model::ModelStorage;
+    use dojo::event::EventStorage;
 
     use crate::models::queue::MatchQueue;
     use crate::models::match_id_counter::MatchIDCounter;
-    use crate::models::game_match::GameMatch;
+    use crate::models::game_match::{GameMatch, MatchCreated};
     use crate::models::enums::{GameType, GameStatus};
     use crate::systems::init_board::{init_classic_board, init_corner_board};
 
@@ -108,6 +109,8 @@ pub mod queue_system {
         };
     
         world.write_model(@new_match);
+
+        world.emit_event(@MatchCreated {match_id: match_id_u32,player1: p1,player2: p2, status: GameStatus::InProgress, game_type: g_type});
     
         if g_type == GameType::ClassicCheckers {
             println!("Calling init_classic_board for match_id {:?}", match_id_u32);

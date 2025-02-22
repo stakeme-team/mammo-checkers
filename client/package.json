@@ -10,12 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.1",
     "@cartridge/connector": "^0.6.0",
     "@cartridge/controller": "^0.6.0",
     "@cartridge/ui-next": "^0.5.0-alpha.1",
     "@starknet-react/chains": "^3.1.2",
     "@starknet-react/core": "^3.7.2",
     "@vitejs/plugin-react": "^4.3.4",
+    "graphql": "^16.10.0",
+    "graphql-ws": "^6.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-unity-webgl": "^9.7.0",
