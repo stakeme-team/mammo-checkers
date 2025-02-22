@@ -10,9 +10,11 @@ pub mod actions {
     use super::IActions;
     use starknet::get_caller_address;
     use dojo::model::ModelStorage;
+    use dojo::event::EventStorage;
     // Импорт моделей
     use crate::models::enums::{GameType, GameStatus};
     use crate::models::game_match::GameMatch;
+    use crate::models::board_piece::MoveMade;
     
     use crate::systems::checkers_logic::{
         execute_classic_move,
@@ -59,6 +61,15 @@ pub mod actions {
             println!("check win2 {:?}", gm.status);
             // Сохраняем обновленный GameMatch
             world.write_model(@gm);
+
+            world.emit_event(@MoveMade {
+                match_id: match_id,
+                player: caller,
+                from_x: from_x,
+                from_y: from_y,
+                to_x: to_x,
+                to_y: to_y,
+            });
         }
 
           /// Мультиход для уголков: список (from_x, from_y, to_x, to_y).
@@ -98,6 +109,8 @@ pub mod actions {
                 corner_steps.append(step);
             };
 
+            let corner_steps_copy = corner_steps.clone(); 
+
             // 4) Вызываем нашу функцию, которая сделает все ходы
             gm = execute_corner_multi_moves(ref world, gm, corner_steps);
 
@@ -106,6 +119,17 @@ pub mod actions {
 
             // 6) Сохраняем изменения
             world.write_model(@gm);
+
+            for step in corner_steps_copy {
+                world.emit_event(@MoveMade {
+                    match_id: match_id,
+                    player: caller,
+                    from_x: step.from_x,
+                    from_y: step.from_y,
+                    to_x: step.to_x,
+                    to_y: step.to_y,
+                });
+            }
         }
 
         fn offer_draw(ref self: ContractState, match_id: u32) {

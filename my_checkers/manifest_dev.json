@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x61db01335bf2b9518f278971dd05bb9be73cb73d66ca7a26d7957df3374d64",
-      "class_hash": "0x5966034ff1e1b1e965d4172384518725945dace262efef859ef2d7f4f8b3c26",
+      "address": "0x519941073916af8b117c423f7f76ee5f25297b269c405459afce77419f16bc6",
+      "class_hash": "0x421b69e8c3489f1abe756c4c19a226fc4924a6ac0ebcfc222bf4f88d4976ad1",
       "abi": [
         {
           "type": "impl",
@@ -1750,6 +1750,12 @@
       "class_hash": "0x4f73fe2f84742d5ac33c702bd395998cd3e948d5506f3e38aa0c813f6227325",
       "tag": "my_checkers-MatchCreated",
       "selector": "0x772ce15cef37568a938d6b878c658e909b16a8428bfa8e4af00c85549d26822"
+    },
+    {
+      "members": [],
+      "class_hash": "0x7364cd778a74058400c125ce13ac2d41b803663357ec5e2ba17340ad2936439",
+      "tag": "my_checkers-MoveMade",
+      "selector": "0x1f826a08f38764fc989d6644aa46867c78274132585e79b12ad04ea45ed2826"
     }
   ]
 }

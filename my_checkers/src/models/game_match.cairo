@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 use crate::models::enums::{GameType, GameStatus};
 
-#[derive(Copy, Drop, Debug, Serde, Introspect)]
+#[derive(Copy, Drop, Debug, Serde)]
 #[dojo::model]
 pub struct GameMatch {
     #[key]
