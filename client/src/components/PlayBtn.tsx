@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useAccount } from '@starknet-react/core'
 import { gql, useQuery } from '@apollo/client'
 import { Unity, useUnityContext } from "react-unity-webgl";
+import { MatchCreatedSubscription, MoveMadeSubscription } from './EventsSubscription';
 
 const CHECK_QUEUE_QUERY = gql`
   query MyCheckersMatchQueueModels($player: String!) {
@@ -64,7 +65,7 @@ const CHECK_PLAYER1_MATCHES = gql`
 
 export const JoinQueue = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
-  const [waiting, setWaiting] = useState<boolean>(false);
+  const [readyMatch, setReady] = useState<boolean>(false);
   const [showUnity, setShowUnity] = useState<boolean>(false);
   const [matchData, setMatchData] = useState<{
     player: number;
@@ -72,7 +73,7 @@ export const JoinQueue = () => {
     match_id: number;
   } | null>(null);
   const { account } = useAccount();
-  
+
   const { data: queueData, loading: queueLoading } = useQuery(CHECK_QUEUE_QUERY, {
     variables: { player: account?.address },
     skip: !account?.address
@@ -130,74 +131,102 @@ export const JoinQueue = () => {
   }, [isLoaded, matchData, sendMessage]);
 
   const execute = useCallback(async () => {
-      if (!account) return;
+    if (!account) return;
 
-      // Проверка очереди
-      if (queueData?.myCheckersMatchQueueModels?.edges?.length > 0) {
-        setWaiting(true);
+    // Проверка очереди
+    if (queueData?.myCheckersMatchQueueModels?.edges?.length > 0) {
+      setReady(true);
+      setShowUnity(false);
+      return;
+    }
+
+    // Проверка матчей где игрок player2
+    if (player2Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
+      const matchData = player2Matches.myCheckersGameMatchModels.edges[0].node;
+      if (matchData.status === "InProgress") {
+        setMatchData({
+          player: 2,
+          current_turn: matchData.current_turn,
+          match_id: matchData.match_id,
+        });
+        setShowUnity(true);
+        setReady(true);
         return;
       }
+    }
 
-      // Проверка матчей где игрок player2
-      if (player2Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
-        const matchData = player2Matches.myCheckersGameMatchModels.edges[0].node;
-        if (matchData.status === "InProgress") {
-          setMatchData({
-            player: 2,
-            current_turn: matchData.current_turn,
-            match_id: matchData.match_id,
-          });
-          setShowUnity(true);
-          setWaiting(true);
-          return;
-        }
+    // Проверка матчей где игрок player1
+    if (player1Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
+      const matchData = player1Matches.myCheckersGameMatchModels.edges[0].node;
+      if (matchData.status === "InProgress") {
+        setMatchData({
+          player: 1,
+          current_turn: matchData.current_turn,
+          match_id: matchData.match_id,
+        });
+        setShowUnity(true);
+        setReady(true);
+        return;
       }
+    }
 
-      // Проверка матчей где игрок player1
-      if (player1Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
-        const matchData = player1Matches.myCheckersGameMatchModels.edges[0].node;
-        if (matchData.status === "InProgress") {
-          setMatchData({
-            player: 1,
-            current_turn: matchData.current_turn,
-            match_id: matchData.match_id,
-          });
-          setShowUnity(true);
-          setWaiting(true);
-          return;
-        }
-      }
-
-      // Если ни одна проверка не прошла, выполняем стандартную логику
-      setSubmitted(true);
-      try {
-        const result = await account.execute([
-          {
-            contractAddress: "0x6097d4898eb167c6e6020af162341d22c18b3997e53ecd3e35bc6dd8e5e54f3",
-            entrypoint: "join_queue",
-            calldata: [1],
-          },
-        ]);
-        setShowUnity(false);
-        setWaiting(true);
-        setMatchFound(false);
-        console.log(result);
-      } catch (e) {
+    // Если ни одна проверка не прошла, выполняем стандартную логику
+    setSubmitted(true);
+    try {
+      const result = await account.execute([
+        {
+          contractAddress: "0x6097d4898eb167c6e6020af162341d22c18b3997e53ecd3e35bc6dd8e5e54f3",
+          entrypoint: "join_queue",
+          calldata: [1],
+        },
+      ]);
+      setShowUnity(false);
+      setReady(true);
+      console.log(result);
+    } catch (e) {
       console.error(e);
-      } finally {
-        setSubmitted(false);
-      }
+    } finally {
+      setSubmitted(false);
+    }
   }, [account, queueData, player2Matches, player1Matches]);
+
+  const handleMatchCreated = useCallback((matchInfo: any) => {
+    if (!account?.address) return;
+
+    // Проверяем, участвует ли текущий игрок в матче
+    if (matchInfo.player1 === account.address || matchInfo.player2 === account.address) {
+      const playerNumber = matchInfo.player1 === account.address ? 1 : 2;
+
+      setMatchData({
+        player: playerNumber,
+        current_turn: playerNumber, // Первый ход у player1
+        match_id: matchInfo.match_id,
+      });
+      setShowUnity(true);
+      setReady(true);
+    }
+  }, [account]);
 
   if (!account) return null;
 
-  if (waiting) {
+  if (readyMatch) {
     return (
       <div>
         {showUnity ? (
-          <Unity unityProvider={unityProvider} style={{ width: '600px', height: '600px' }} />
+          <div>
+            <Unity unityProvider={unityProvider} style={{ width: '600px', height: '600px' }} />
+            <MoveMadeSubscription 
+              match_id={matchData?.match_id}
+              address={account.address}
+              sendMessage={sendMessage}
+              current_turn={matchData?.player}
+            />
+          </div>
         ) : (
-          <p>Waiting for another player. Please wait...</p>
+          <div>
+            <p>Waiting for another player. Please wait...</p>
+            <MatchCreatedSubscription onMatchCreated={handleMatchCreated} />
+          </div>
         )}
         <button disabled>Play</button>
       </div>
@@ -205,10 +234,10 @@ export const JoinQueue = () => {
   }
 
   return (
-      <div>
+    <div>
       <button onClick={() => execute()} disabled={submitted}>
-          Play
-        </button>
-      </div>
+        Play
+      </button>
+    </div>
   );
 };

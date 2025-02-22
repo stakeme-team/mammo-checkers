@@ -6,7 +6,6 @@ import { StarknetProvider } from './context/StarknetProvider'
 
 import { ConnectWallet } from './components/ConnectWallet'
 import { JoinQueue } from './components/PlayBtn'           
-import { MatchCreatedSubscription } from './components/EventsSubscription' 
 
 function App() {
   return (
@@ -14,7 +13,6 @@ function App() {
       <ApolloProvider client={apolloClient}>
         <ConnectWallet />
         <JoinQueue />
-        <MatchCreatedSubscription />
       </ApolloProvider>
     </StarknetProvider>
   )
