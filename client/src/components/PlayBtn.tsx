@@ -133,6 +133,7 @@ export const JoinQueue = () => {
         formattedSteps.push([steps[i], steps[i+1], steps[i+2], steps[i+3]]);
       }
 
+      console.log(formattedSteps.length, ...formattedSteps.flat())
       const result = await account.execute([
         {
           contractAddress: "0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
