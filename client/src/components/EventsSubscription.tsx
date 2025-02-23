@@ -75,7 +75,6 @@ export function MoveMadeSubscription({
             const { data } = await refetchTurn({ match_id: matchInfo.match_id });
             if (data) {
               const currentTurn = data.myCheckersGameMatchModels.edges[0].node.current_turn;
-              console.log(currentTurn, data)
               sendMessage("Board", "UpdateBoardFromServer", currentTurn);
             }
           };

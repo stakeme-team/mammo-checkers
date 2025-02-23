@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
 import { gql, useSubscription } from '@apollo/client'
+import { lookupAddresses } from '@cartridge/controller'
+import { useNavigate } from 'react-router-dom'
 
 const SUBSCRIBE_ONE_MATCH = gql`
   subscription WatchOneMatch($id: ID!) {
@@ -23,6 +25,7 @@ interface WatchMatchProps {
 }
 
 export function WatchMatch({ matchId }: WatchMatchProps) {
+  const navigate = useNavigate()
   const skip = !matchId
 
   const { data, loading, error } = useSubscription(SUBSCRIBE_ONE_MATCH, {
@@ -31,9 +34,31 @@ export function WatchMatch({ matchId }: WatchMatchProps) {
   })
 
   useEffect(() => {
+    const handleMatchResult = async (matchModel: any) => {
+      try {
+        if (matchModel.status === 'Finished') {
+          const addressMap = await lookupAddresses([matchModel.winner])
+          const winnerName = addressMap.get(matchModel.winner) || 'Unknown Player'
+          const confirmed = window.confirm(`Congratulations! Player ${winnerName} has won the game.\n\nClick OK to return to main menu.`)
+          if (confirmed) {
+            navigate('/')
+          }
+        } else if (matchModel.status === 'Draw') {
+          const confirmed = window.confirm(`The match ended in a draw!\n\nClick OK to return to main menu.`)
+          if (confirmed) {
+            navigate('/')
+          }
+        }
+      } catch (err) {
+        console.error('Error handling match result:', err)
+      }
+    }
+
     if (error) {
       console.error("WatchOneMatch subscription error:", error)
+      return
     }
+    
     if (!loading && data) {
       console.log("Update for match:", matchId, data)
       const entity = data.entityUpdated
@@ -41,13 +66,11 @@ export function WatchMatch({ matchId }: WatchMatchProps) {
         const matchModel = entity.models.find((m: any) => m.__typename === 'my_checkers_GameMatch')
         if (matchModel) {
           console.log("Match status:", matchModel.status, "winner:", matchModel.winner)
-          if (matchModel.status === 'Finished') {
-            alert(`Match is finished! Winner = ${matchModel.winner}`)
-          }
+          handleMatchResult(matchModel)
         }
       }
     }
-  }, [loading, data, error, matchId])
+  }, [loading, data, error, matchId, navigate])
 
   if (skip) return null
   return <div>Watching Match ID: {matchId}</div>

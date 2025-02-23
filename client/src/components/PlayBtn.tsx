@@ -4,6 +4,8 @@ import { gql, useQuery } from '@apollo/client'
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { MatchCreatedSubscription, MoveMadeSubscription } from './EventsSubscription';
 import Modal from 'react-modal';
+import { DrawButton } from './DrawButton';
+import { DrawSubscription } from './DrawSubscription';
 
 // Устанавливаем элемент приложения для модального окна
 Modal.setAppElement('#root');
@@ -79,6 +81,7 @@ export const JoinQueue = () => {
   } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { account } = useAccount();
+  const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
 
   const { data: queueData, loading: queueLoading } = useQuery(CHECK_QUEUE_QUERY, {
     variables: { player: account?.address },
@@ -162,6 +165,9 @@ export const JoinQueue = () => {
     if (isLoaded && matchData) {
       const { player, current_turn, match_id, game_type } = matchData;
       sendMessage("Board", "InitPlayer", `${player},${current_turn},${match_id},${game_type}`);
+      
+      // Добавляем подписку на DrawSubscription при запуске Unity
+      setShowUnity(true);
     }
   }, [isLoaded, matchData, sendMessage]);
 
@@ -234,14 +240,14 @@ export const JoinQueue = () => {
 
   const handleMatchCreated = useCallback((matchInfo: any) => {
     if (!account?.address) return;
-
+    
     // Проверяем, участвует ли текущий игрок в матче
     if (String(matchInfo.player1) === String(account.address) || String(matchInfo.player2) === String(account.address)) {
       const playerNumber = String(matchInfo.player1) === String(account.address) ? 1 : 2;
 
       setMatchData({
         player: playerNumber,
-        current_turn: playerNumber, // Первый ход у player1
+        current_turn: 1,
         match_id: matchInfo.match_id,
         game_type: matchInfo.game_type
       });
@@ -249,6 +255,12 @@ export const JoinQueue = () => {
       setReady(true);
     }
   }, [account]);
+
+  const handleDrawOffer = (matchId: number, playerAddress: string) => {
+    if (account?.address !== playerAddress) {
+      setOpponentOfferedDraw(true);
+    }
+  };
 
   if (!account) return null;
 
@@ -263,6 +275,13 @@ export const JoinQueue = () => {
               address={account.address}
               sendMessage={sendMessage}
             />
+            <DrawButton 
+              matchId={matchData?.match_id} 
+              playerNumber={matchData?.player}
+              opponentOfferedDraw={opponentOfferedDraw}
+              onOpponentOffer={() => setOpponentOfferedDraw(true)}
+            />
+            <DrawSubscription onDrawOffer={handleDrawOffer} />
           </div>
         ) : (
           <div>

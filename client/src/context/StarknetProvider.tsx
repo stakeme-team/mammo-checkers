@@ -14,8 +14,9 @@ const policies: SessionPolicies = {
     contracts: {
         [CONTRACT_ACTIONS]: {
             methods: [
-                {name: "Checkers", entrypoint: "make_move"},
-                {name: "Corner", entrypoint: "corner_make_moves"},
+                {name: "Move in checkers", entrypoint: "make_move"},
+                {name: "Move in corner", entrypoint: "corner_make_moves"},
+                //{name: "Offer draw", entrypoint: "offer_draw"},
             ],
         },
     }
