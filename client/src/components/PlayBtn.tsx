@@ -261,7 +261,6 @@ export const JoinQueue = () => {
               match_id={matchData?.match_id}
               address={account.address}
               sendMessage={sendMessage}
-              current_turn={matchData?.player}
             />
           </div>
         ) : (

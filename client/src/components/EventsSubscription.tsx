@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { gql, useSubscription } from '@apollo/client'
+import { gql, useSubscription, useQuery, useLazyQuery } from '@apollo/client'
 
 const SUBSCRIBE_EVENT_MESSAGE_UPDATED = gql`
   subscription {
@@ -37,14 +37,26 @@ export function MoveMadeSubscription({
   address, 
   match_id,
   sendMessage,
-  current_turn,
 }: { 
   match_id?: number,
   address?: string,
   sendMessage: (gameObject: string, method: string, parameter?: string) => void,
-  current_turn?: number,
 }) {
   const { data, loading, error } = useSubscription(SUBSCRIBE_EVENT_MOVE_MADE)
+  const { refetch: refetchTurn } = useQuery(gql`
+    query MyCheckersGameMatchModels($match_id: Int!) {
+      myCheckersGameMatchModels(first: 1, where: { match_id: $match_id }) {
+        edges {
+          node {
+            current_turn
+          }
+        }
+      }
+    }
+  `, {
+    variables: { match_id },
+    skip: true // Изначально запрос не выполняется
+  });
 
   useEffect(() => {
     if (error) {
@@ -52,7 +64,6 @@ export function MoveMadeSubscription({
       return
     }
     if (!loading && data) {
-      
       console.log('Got eventMessageUpdated:', data.eventMessageUpdated)
 
       const { models } = data.eventMessageUpdated
@@ -60,12 +71,21 @@ export function MoveMadeSubscription({
         const matchInfo = models[0]
         
         if (String(matchInfo.match_id) === String(match_id) && String(matchInfo.player) !== String(address)) {
-        //TODO: NEED PROVIDE current_turn right, make new request from match or get from subsribe event
-          sendMessage("Board", "UpdateBoardFromServer", current_turn)
+          const fetchTurn = async () => {
+            const { data } = await refetchTurn({ match_id: matchInfo.match_id });
+            if (data) {
+              const currentTurn = data.myCheckersGameMatchModels.edges[0].node.current_turn;
+              console.log(currentTurn, data)
+              sendMessage("Board", "UpdateBoardFromServer", currentTurn);
+            }
+          };
+          fetchTurn();
         }
       }
     }
   }, [loading, data, error])
+
+  return null;
 }
 
 export function MatchCreatedSubscription({ onMatchCreated }: { onMatchCreated: (matchInfo: any) => void }) {
