@@ -1,5 +1,5 @@
 // App.tsx
-import React from 'react'
+import React, { useState } from 'react'
 import { ApolloProvider } from '@apollo/client'
 import { apolloClient } from './graphql/client'
 import { StarknetProvider } from './context/StarknetProvider' 

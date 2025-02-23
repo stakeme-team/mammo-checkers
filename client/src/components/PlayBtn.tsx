@@ -3,6 +3,10 @@ import { useAccount } from '@starknet-react/core'
 import { gql, useQuery } from '@apollo/client'
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { MatchCreatedSubscription, MoveMadeSubscription } from './EventsSubscription';
+import Modal from 'react-modal';
+
+// Устанавливаем элемент приложения для модального окна
+Modal.setAppElement('#root');
 
 const CHECK_QUEUE_QUERY = gql`
   query MyCheckersMatchQueueModels($player: String!) {
@@ -71,7 +75,9 @@ export const JoinQueue = () => {
     player: number;
     current_turn: number;
     match_id: number;
+    game_type: string,
   } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { account } = useAccount();
 
   const { data: queueData, loading: queueLoading } = useQuery(CHECK_QUEUE_QUERY, {
@@ -103,7 +109,7 @@ export const JoinQueue = () => {
     try {
       const result = await account.execute([
         {
-          contractAddress: "0x519941073916af8b117c423f7f76ee5f25297b269c405459afce77419f16bc6",
+          contractAddress: "0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
           entrypoint: "make_move",
           calldata: [matchId, fromX, fromY, toX, toY],
         },
@@ -116,19 +122,68 @@ export const JoinQueue = () => {
     }
   }, [account]);
 
+  const handleMoveCornerPiece = useCallback(async (matchId: number, steps: number[]) => {
+    if (!account) return;
+
+    setSubmitted(true);
+    try {
+      // Преобразуем steps в массив кортежей
+      const formattedSteps = [];
+      for (let i = 0; i < steps.length; i += 4) {
+        formattedSteps.push([steps[i], steps[i+1], steps[i+2], steps[i+3]]);
+      }
+
+      const result = await account.execute([
+        {
+          contractAddress: "0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
+          entrypoint: "corner_make_moves",
+          calldata: [matchId, formattedSteps.length, ...formattedSteps.flat()],
+        },
+      ]);
+      console.log(result);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitted(false);
+    }
+  }, [account]);
+
   useEffect(() => {
     addEventListener("MovePiece", handleMovePiece);
+    addEventListener("MoveCornerPiece", handleMoveCornerPiece);
     return () => {
       removeEventListener("MovePiece", handleMovePiece);
+      removeEventListener("MoveCornerPiece", handleMoveCornerPiece);
     };
-  }, [addEventListener, removeEventListener, handleMovePiece]);
+  }, [addEventListener, removeEventListener, handleMovePiece, handleMoveCornerPiece]);
 
   useEffect(() => {
     if (isLoaded && matchData) {
-      const { player, current_turn, match_id } = matchData;
-      sendMessage("Board", "InitPlayer", `${player},${current_turn},${match_id}`);
+      const { player, current_turn, match_id, game_type } = matchData;
+      sendMessage("Board", "InitPlayer", `${player},${current_turn},${match_id},${game_type}`);
     }
   }, [isLoaded, matchData, sendMessage]);
+
+  const handleGameTypeSelection = async (gameType: number) => {
+    setIsModalOpen(false);
+    setSubmitted(true);
+    try {
+      const result = await account.execute([
+        {
+          contractAddress: "0x4fc3b7a38f6f83fc30c8dc5ae6f28088fbd47aa6147aaac11df80ac39bd646f",
+          entrypoint: "join_queue",
+          calldata: [gameType],
+        },
+      ]);
+      setShowUnity(false);
+      setReady(true);
+      console.log(result);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitted(false);
+    }
+  };
 
   const execute = useCallback(async () => {
     if (!account) return;
@@ -148,6 +203,7 @@ export const JoinQueue = () => {
           player: 2,
           current_turn: matchData.current_turn,
           match_id: matchData.match_id,
+          game_type: matchData.game_type
         });
         setShowUnity(true);
         setReady(true);
@@ -163,6 +219,7 @@ export const JoinQueue = () => {
           player: 1,
           current_turn: matchData.current_turn,
           match_id: matchData.match_id,
+          game_type: matchData.game_type
         });
         setShowUnity(true);
         setReady(true);
@@ -170,24 +227,8 @@ export const JoinQueue = () => {
       }
     }
 
-    // Если ни одна проверка не прошла, выполняем стандартную логику
-    setSubmitted(true);
-    try {
-      const result = await account.execute([
-        {
-          contractAddress: "0x6097d4898eb167c6e6020af162341d22c18b3997e53ecd3e35bc6dd8e5e54f3",
-          entrypoint: "join_queue",
-          calldata: [1],
-        },
-      ]);
-      setShowUnity(false);
-      setReady(true);
-      console.log(result);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSubmitted(false);
-    }
+    // Если ни одна проверка не прошла, открываем модалку
+    setIsModalOpen(true);
   }, [account, queueData, player2Matches, player1Matches]);
 
   const handleMatchCreated = useCallback((matchInfo: any) => {
@@ -201,6 +242,7 @@ export const JoinQueue = () => {
         player: playerNumber,
         current_turn: playerNumber, // Первый ход у player1
         match_id: matchInfo.match_id,
+        game_type: matchInfo.game_type
       });
       setShowUnity(true);
       setReady(true);
@@ -238,6 +280,45 @@ export const JoinQueue = () => {
       <button onClick={() => execute()} disabled={submitted}>
         Play
       </button>
+
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        style={{
+          content: {
+            width: '300px',
+            height: '200px',
+            margin: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#1a1a1a',
+            color: '#ffffff',
+            border: '1px solid #333',
+            borderRadius: '8px',
+          },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          }
+        }}
+      >
+        <h3>What do you want to play?</h3>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+          <button 
+            onClick={() => handleGameTypeSelection(0)}
+            style={{ backgroundColor: '#646cff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Corner
+          </button>
+          <button 
+            onClick={() => handleGameTypeSelection(1)}
+            style={{ backgroundColor: '#646cff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Checkers
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

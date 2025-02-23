@@ -8,13 +8,14 @@ import {RpcProvider} from "starknet";
 import {SessionPolicies} from "@cartridge/controller";
 
 
-const CONTRACT_ACTIONS = '0x519941073916af8b117c423f7f76ee5f25297b269c405459afce77419f16bc6'
+const CONTRACT_ACTIONS = '0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f'
 
 const policies: SessionPolicies = {
     contracts: {
         [CONTRACT_ACTIONS]: {
             methods: [
-                {name: "make_move", entrypoint: "make_move"},
+                {name: "Checkers", entrypoint: "make_move"},
+                {name: "Corner", entrypoint: "corner_make_moves"},
             ],
         },
     }

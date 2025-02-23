@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x519941073916af8b117c423f7f76ee5f25297b269c405459afce77419f16bc6",
-      "class_hash": "0x421b69e8c3489f1abe756c4c19a226fc4924a6ac0ebcfc222bf4f88d4976ad1",
+      "address": "0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
+      "class_hash": "0x75d4660b8db3a2bfb7cee23c806ae8cb957ad298cd0c55cafcdafa8e433b0be",
       "abi": [
         {
           "type": "impl",
@@ -1498,8 +1498,8 @@
       ]
     },
     {
-      "address": "0x6097d4898eb167c6e6020af162341d22c18b3997e53ecd3e35bc6dd8e5e54f3",
-      "class_hash": "0x523322c719794eea30c67d323eb86b8f1757ab6f9af7510879bc701a7982b4f",
+      "address": "0x4fc3b7a38f6f83fc30c8dc5ae6f28088fbd47aa6147aaac11df80ac39bd646f",
+      "class_hash": "0x388a596e3684db1bc5a3ac70bdbea4596eeeea6c74a59e2683a78930b1cf1d9",
       "abi": [
         {
           "type": "impl",
@@ -1721,7 +1721,7 @@
     },
     {
       "members": [],
-      "class_hash": "0xb1dbcedfd88efe0006bc6873da1fd881e760caf57bfbe52bb33df2df49e74c",
+      "class_hash": "0x32c43caae935270da750f415a1aa39fb1fb44d3f8e6c80b2408b1938297873f",
       "tag": "my_checkers-GameMatch",
       "selector": "0x6a3babdf2fed962da4893ecb469619845099bfb05dc9356089291d5fbc2a864"
     },
@@ -1745,6 +1745,12 @@
     }
   ],
   "events": [
+    {
+      "members": [],
+      "class_hash": "0x4b3087698fa8333baa0a946e0115d5c8789fea5297d889587b77b6ec039ccad",
+      "tag": "my_checkers-DrawOffered",
+      "selector": "0x274a83fa607f0370efac6676a38cf93490749de78f96a918f783c98f1c1c6e7"
+    },
     {
       "members": [],
       "class_hash": "0x4f73fe2f84742d5ac33c702bd395998cd3e948d5506f3e38aa0c813f6227325",
