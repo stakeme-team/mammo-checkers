@@ -194,8 +194,8 @@ export const JoinQueue = () => {
     if (!account?.address) return;
 
     // Проверяем, участвует ли текущий игрок в матче
-    if (matchInfo.player1 === account.address || matchInfo.player2 === account.address) {
-      const playerNumber = matchInfo.player1 === account.address ? 1 : 2;
+    if (String(matchInfo.player1) === String(account.address) || String(matchInfo.player2) === String(account.address)) {
+      const playerNumber = String(matchInfo.player1) === String(account.address) ? 1 : 2;
 
       setMatchData({
         player: playerNumber,
