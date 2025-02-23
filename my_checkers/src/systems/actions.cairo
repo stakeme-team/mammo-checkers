@@ -8,12 +8,12 @@ pub trait IActions<T> {
 #[dojo::contract]
 pub mod actions {
     use super::IActions;
-    use starknet::get_caller_address;
+    use starknet::{get_caller_address, contract_address_const};
     use dojo::model::ModelStorage;
     use dojo::event::EventStorage;
     // Импорт моделей
     use crate::models::enums::{GameType, GameStatus};
-    use crate::models::game_match::GameMatch;
+    use crate::models::game_match::{GameMatch, DrawOffered};
     use crate::models::board_piece::MoveMade;
     
     use crate::systems::checkers_logic::{
@@ -138,11 +138,32 @@ pub mod actions {
             
             // Проверяем, что игра идет
             assert!(gm.status == GameStatus::InProgress, "Game must be in progress");
+        
+            // Проверяем, что вызывающий адрес один из игроков матча
+            let caller = get_caller_address();
+            assert!(caller == gm.player1 || caller == gm.player2, "You must be in this match to offer a draw");
             
-            // Упрощенно ставим статус ничьи
-            gm.status = GameStatus::Draw;
-            world.write_model(@gm);
-        }
+            // Устанавливаем флаг, что игрок согласен на ничью
+            if caller == gm.player1 {
+                gm.draw_offered_by_p1 = true;
+            } else if caller == gm.player2 {
+                gm.draw_offered_by_p2 = true;
+            }
+        
+            if gm.draw_offered_by_p1 && gm.draw_offered_by_p2 {
+                gm.status = GameStatus::Draw;
+                gm.winner = contract_address_const::<0>(); 
+                world.write_model(@gm);
+                
+                // Отправляем событие о ничьей
+                world.emit_event(@DrawOffered {
+                    match_id: match_id,
+                    player: caller,
+                });
+            } else {
+                world.write_model(@gm);
+            }
+        }        
     }
 
     #[generate_trait]

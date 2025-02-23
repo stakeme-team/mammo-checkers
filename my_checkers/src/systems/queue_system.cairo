@@ -106,6 +106,8 @@ pub mod queue_system {
             last_move_timestamp: 0,
             move_count: 0,
             winner: contract_address_const::<0>(), 
+            draw_offered_by_p1: false,
+            draw_offered_by_p2: false
         };
     
         world.write_model(@new_match);

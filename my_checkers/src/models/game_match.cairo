@@ -22,8 +22,8 @@ pub struct GameMatch {
     pub move_count: u32,  // счётчик ходов
 
     pub winner: ContractAddress,
-    // draw_offered_by_p1: bool,
-    // draw_offered_by_p2: bool,
+    pub draw_offered_by_p1: bool,
+    pub draw_offered_by_p2: bool,
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -35,4 +35,12 @@ pub struct MatchCreated {
     pub player2: ContractAddress,
     pub status: GameStatus,
     pub game_type: GameType,
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::event]
+pub struct DrawOffered {
+    #[key]
+    pub match_id: u32,
+    pub player: ContractAddress,
 }
