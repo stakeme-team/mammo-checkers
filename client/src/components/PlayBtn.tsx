@@ -133,7 +133,7 @@ export const JoinQueue = () => {
       // Преобразуем steps в массив кортежей
       const formattedSteps = [];
       for (let i = 0; i < steps.length; i += 4) {
-        formattedSteps.push([steps[i], steps[i+1], steps[i+2], steps[i+3]]);
+        formattedSteps.push([steps[i], steps[i + 1], steps[i + 2], steps[i + 3]]);
       }
 
       console.log(formattedSteps.length, ...formattedSteps.flat())
@@ -165,7 +165,7 @@ export const JoinQueue = () => {
     if (isLoaded && matchData) {
       const { player, current_turn, match_id, game_type } = matchData;
       sendMessage("Board", "InitPlayer", `${player},${current_turn},${match_id},${game_type}`);
-      
+
       // Добавляем подписку на DrawSubscription при запуске Unity
       setShowUnity(true);
     }
@@ -240,7 +240,7 @@ export const JoinQueue = () => {
 
   const handleMatchCreated = useCallback((matchInfo: any) => {
     if (!account?.address) return;
-    
+
     // Проверяем, участвует ли текущий игрок в матче
     if (String(matchInfo.player1) === String(account.address) || String(matchInfo.player2) === String(account.address)) {
       const playerNumber = String(matchInfo.player1) === String(account.address) ? 1 : 2;
@@ -270,18 +270,20 @@ export const JoinQueue = () => {
         {showUnity ? (
           <div>
             <Unity unityProvider={unityProvider} style={{ width: '600px', height: '600px' }} />
-            <MoveMadeSubscription 
+            <MoveMadeSubscription
               match_id={matchData?.match_id}
               address={account.address}
               sendMessage={sendMessage}
             />
-            <DrawButton 
-              matchId={matchData?.match_id} 
+            <DrawButton
+              matchId={matchData?.match_id}
               playerNumber={matchData?.player}
               opponentOfferedDraw={opponentOfferedDraw}
               onOpponentOffer={() => setOpponentOfferedDraw(true)}
             />
             <DrawSubscription onDrawOffer={handleDrawOffer} />
+            {/* Подключаем WatchMatch для отслеживания изменений в матче */}
+            {matchData?.match_id && <WatchMatch matchId={String(matchData.match_id)} />}
           </div>
         ) : (
           <div>
@@ -324,13 +326,13 @@ export const JoinQueue = () => {
       >
         <h3>What do you want to play?</h3>
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-          <button 
+          <button
             onClick={() => handleGameTypeSelection(0)}
             style={{ backgroundColor: '#646cff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
           >
             Corner
           </button>
-          <button 
+          <button
             onClick={() => handleGameTypeSelection(1)}
             style={{ backgroundColor: '#646cff', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
           >

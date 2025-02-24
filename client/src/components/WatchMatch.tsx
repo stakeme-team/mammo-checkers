@@ -18,7 +18,7 @@ const SUBSCRIBE_ONE_MATCH = gql`
       }
     }
   }
-`
+`;
 
 interface WatchMatchProps {
   matchId: string  
@@ -55,23 +55,31 @@ export function WatchMatch({ matchId }: WatchMatchProps) {
     }
 
     if (error) {
-      console.error("WatchOneMatch subscription error:", error)
+      console.error("Ошибка подписки WatchOneMatch:", error)
       return
     }
     
     if (!loading && data) {
-      console.log("Update for match:", matchId, data)
+      console.log("Обновление матча:", matchId, data)
       const entity = data.entityUpdated
       if (entity && entity.models?.length > 0) {
         const matchModel = entity.models.find((m: any) => m.__typename === 'my_checkers_GameMatch')
         if (matchModel) {
-          console.log("Match status:", matchModel.status, "winner:", matchModel.winner)
-          handleMatchResult(matchModel)
+          console.log("Статус матча:", matchModel.status, "Победитель:", matchModel.winner)
+          // Обработка завершённого матча или ничьей
+          if (matchModel.status === 'Finished' || matchModel.status === 'Draw') {
+            if (!matchModel.winner || matchModel.status === 'Draw') {
+              alert("Матч завершён! Ничья.")
+            } else {
+              alert(`Матч завершён! Победитель: ${matchModel.winner}`)
+            }
+            handleMatchResult(matchModel)
+          }
         }
       }
     }
   }, [loading, data, error, matchId, navigate])
 
   if (skip) return null
-  return <div>Watching Match ID: {matchId}</div>
+  return <div>Отслеживание матча с ID: {matchId}</div>
 }
