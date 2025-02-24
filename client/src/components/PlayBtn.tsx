@@ -6,6 +6,7 @@ import { MatchCreatedSubscription, MoveMadeSubscription } from './EventsSubscrip
 import Modal from 'react-modal';
 import { DrawButton } from './DrawButton';
 import { DrawSubscription } from './DrawSubscription';
+import { WatchMatch } from './WatchMatch';
 
 // Устанавливаем элемент приложения для модального окна
 Modal.setAppElement('#root');
