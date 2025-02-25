@@ -17,6 +17,7 @@
     "@starknet-react/chains": "^3.1.2",
     "@starknet-react/core": "^3.7.2",
     "@vitejs/plugin-react": "^4.3.4",
+    "fs": "^0.0.1-security",
     "graphql": "^16.10.0",
     "graphql-ws": "^6.0.4",
     "react": "^18.3.1",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",
+    "@types/node": "^22.13.5",
     "@types/react": "^19.0.10",
     "eslint": "^9.20.1",
     "eslint-plugin-react": "^7.37.4",
