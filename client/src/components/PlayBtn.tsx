@@ -176,6 +176,7 @@ export const JoinQueue = () => {
 		// Проверка очереди
 		if (queueData?.myCheckersMatchQueueModels?.edges?.length > 0) {
 			setReady(true);
+
 			return;
 		}
 
@@ -190,7 +191,6 @@ export const JoinQueue = () => {
 					game_type: matchData.game_type,
 				});
 				navigate("/game");
-
 				setReady(true);
 				return;
 			}

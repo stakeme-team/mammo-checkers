@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Unity, useUnityContext } from "react-unity-webgl";
-import { useNavigate, useLocation } from "react-router-dom";
 import { MoveMadeSubscription } from "../../components/EventsSubscription";
 import { DrawSubscription } from "../../components/DrawSubscription";
 import { WatchMatch } from "../../components/WatchMatch";
