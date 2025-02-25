@@ -19,32 +19,26 @@ export const Game = () => {
 		match_id: number;
 		game_type: string;
 	} | null>(null);
+
 	const { account } = useAccount();
 	const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
 
-	const { data: queueData, loading: queueLoading } = useQuery(
-		CHECK_QUEUE_QUERY,
-		{
-			variables: { player: account?.address },
-			skip: !account?.address,
-		}
-	);
+	const { data: queueData } = useQuery(CHECK_QUEUE_QUERY, {
+		variables: { player: account?.address },
+		skip: !account?.address,
+		fetchPolicy: "network-only",
+	});
+	const { data: player2Matches } = useQuery(CHECK_PLAYER2_MATCHES, {
+		variables: { player: account?.address },
+		skip: !account?.address,
+		fetchPolicy: "network-only",
+	});
 
-	const { data: player2Matches, loading: player2Loading } = useQuery(
-		CHECK_PLAYER2_MATCHES,
-		{
-			variables: { player: account?.address },
-			skip: !account?.address,
-		}
-	);
-
-	const { data: player1Matches, loading: player1Loading } = useQuery(
-		CHECK_PLAYER1_MATCHES,
-		{
-			variables: { player: account?.address },
-			skip: !account?.address,
-		}
-	);
+	const { data: player1Matches } = useQuery(CHECK_PLAYER1_MATCHES, {
+		variables: { player: account?.address },
+		skip: !account?.address,
+		fetchPolicy: "network-only",
+	});
 
 	const {
 		unityProvider,
@@ -124,10 +118,6 @@ export const Game = () => {
 	);
 
 	useEffect(() => {
-		execute();
-	}, [player1Matches, player2Matches]);
-
-	useEffect(() => {
 		addEventListener("MovePiece", handleMovePiece);
 		addEventListener("MoveCornerPiece", handleMoveCornerPiece);
 		return () => {
@@ -153,6 +143,10 @@ export const Game = () => {
 			// Добавляем подписку на DrawSubscription при запуске Unity
 		}
 	}, [isLoaded, matchData, sendMessage]);
+
+	useEffect(() => {
+		execute();
+	}, [player1Matches, player2Matches]);
 
 	const execute = useCallback(async () => {
 		if (!account) return;
@@ -181,6 +175,7 @@ export const Game = () => {
 		// Проверка матчей где игрок player1
 		if (player1Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
 			const matchData = player1Matches.myCheckersGameMatchModels.edges[0].node;
+			console.log(matchData);
 			if (matchData.status === "InProgress") {
 				setMatchData({
 					player: 1,
@@ -201,6 +196,8 @@ export const Game = () => {
 	};
 
 	if (!account) return null;
+
+	console.log(matchData);
 
 	return (
 		<div
@@ -239,9 +236,11 @@ export const Game = () => {
 						sendMessage={sendMessage}
 					/>
 				</div>
-				{matchData?.match_id && (
-					<WatchMatch matchId={String(matchData.match_id)} />
-				)}
+				<WatchMatch
+					matchId={String(matchData?.match_id)}
+					playerNumber={matchData?.player}
+				/>
+
 				<DrawButton
 					matchId={matchData?.match_id}
 					playerNumber={matchData?.player}

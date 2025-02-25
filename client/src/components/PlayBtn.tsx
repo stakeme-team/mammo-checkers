@@ -1,10 +1,11 @@
 import { useCallback, useState, useEffect } from "react";
 import { useAccount } from "@starknet-react/core";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useSubscription } from "@apollo/client";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import {
 	MatchCreatedSubscription,
 	MoveMadeSubscription,
+	SUBSCRIBE_EVENT_MESSAGE_UPDATED,
 } from "./EventsSubscription";
 import Modal from "react-modal";
 import { CHECK_PLAYER2_MATCHES } from "../graphql/checkPlayer2Matches";
@@ -34,6 +35,7 @@ export const JoinQueue = () => {
 		{
 			variables: { player: account?.address },
 			skip: !account?.address,
+			fetchPolicy: "network-only",
 		}
 	);
 
@@ -42,6 +44,7 @@ export const JoinQueue = () => {
 		{
 			variables: { player: account?.address },
 			skip: !account?.address,
+			fetchPolicy: "network-only",
 		}
 	);
 
@@ -50,6 +53,7 @@ export const JoinQueue = () => {
 		{
 			variables: { player: account?.address },
 			skip: !account?.address,
+			fetchPolicy: "network-only",
 		}
 	);
 
@@ -149,6 +153,9 @@ export const JoinQueue = () => {
 		handleMovePiece,
 		handleMoveCornerPiece,
 	]);
+	const { data: messageData } = useSubscription(
+		SUBSCRIBE_EVENT_MESSAGE_UPDATED
+	);
 
 	const handleGameTypeSelection = async (gameType: number) => {
 		setSubmitted(true);
@@ -219,6 +226,8 @@ export const JoinQueue = () => {
 			if (!account?.address) return;
 
 			// Проверяем, участвует ли текущий игрок в матче
+			console.log(matchInfo);
+
 			if (
 				String(matchInfo.player1) === String(account.address) ||
 				String(matchInfo.player2) === String(account.address)
@@ -242,6 +251,8 @@ export const JoinQueue = () => {
 
 	if (!account) return null;
 
+	console.log(readyMatch);
+
 	return (
 		<div>
 			<button
@@ -250,6 +261,7 @@ export const JoinQueue = () => {
 			>
 				new game
 			</button>
+			<MatchCreatedSubscription onMatchCreated={handleMatchCreated} />
 
 			<Modal
 				isOpen={isModalOpen}
@@ -294,23 +306,13 @@ export const JoinQueue = () => {
 					</>
 				) : (
 					<>
-						<MatchCreatedSubscription onMatchCreated={handleMatchCreated} />
-
-						{/* <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-							<button
-								onClick={() => handleGameTypeSelection(0)}
-								className="first-modal-button"
-							>
-								Start game
-							</button>
-
-							<button
-								onClick={() => handleGameTypeSelection(1)}
-								style={{ background: "#A36DFF" }}
-							>
-								Exit game
-							</button>
-						</div> */}
+						<h3>Looking for an opponent. Please wait</h3>
+						<div className="lds-ellipsis">
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+						</div>
 					</>
 				)}
 			</Modal>

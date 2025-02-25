@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { gql, useSubscription, useQuery, useLazyQuery } from "@apollo/client";
 
-const SUBSCRIBE_EVENT_MESSAGE_UPDATED = gql`
+export const SUBSCRIBE_EVENT_MESSAGE_UPDATED = gql`
 	subscription {
 		eventMessageUpdated {
 			models {
@@ -58,6 +58,7 @@ export function MoveMadeSubscription({
 		{
 			variables: { match_id },
 			skip: true, // Изначально запрос не выполняется
+			fetchPolicy: "network-only",
 		}
 	);
 
@@ -110,7 +111,9 @@ export function MatchCreatedSubscription({
 			console.error("Subscription error:", error);
 			return;
 		}
-		if (!loading && data) {
+		console.log(loading);
+
+		if (data) {
 			const { models } = data.eventMessageUpdated;
 			if (models && models.length > 0) {
 				const matchInfo = models[0];
@@ -121,17 +124,5 @@ export function MatchCreatedSubscription({
 		}
 	}, [loading, data, error, onMatchCreated]);
 
-	return loading ? (
-		<>
-			<h3>Looking for an opponent. Please wait</h3>
-			<div className="lds-ellipsis">
-				<div></div>
-				<div></div>
-				<div></div>
-				<div></div>
-			</div>
-		</>
-	) : (
-		<p>Listening for "MatchCreated" events...</p>
-	);
+	return <></>;
 }
