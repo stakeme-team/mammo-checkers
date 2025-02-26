@@ -51,7 +51,7 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 			await account.execute([
 				{
 					contractAddress:
-						"0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
+						"0x241ffbd1701f9a934ae44f20709dc9bbb1e931abd21d95ab29f4120f3cf6d0a",
 					entrypoint: "offer_draw",
 					calldata: [matchId],
 				},

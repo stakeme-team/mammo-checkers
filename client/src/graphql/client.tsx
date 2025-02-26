@@ -4,12 +4,12 @@ import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
 const httpLink = new HttpLink({
-	uri: "https://api.cartridge.gg/x/mammo-checkers/torii/graphql",
+	uri: "http://localhost:8080/torii/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
 	createClient({
-		url: "wss://api.cartridge.gg/x/mammo-checkers/torii/graphql",
+		url: "ws://localhost:8080/torii/graphql",
 	})
 );
 
