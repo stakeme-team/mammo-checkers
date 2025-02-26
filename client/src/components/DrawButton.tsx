@@ -51,7 +51,7 @@ export const DrawButton = ({
 	}, [data, loading, playerNumber, onOpponentOffer]);
 
 	const handleDrawOffer = async () => {
-		if (!account || !matchId) return;
+		if (!account || typeof matchId != "number") return;
 
 		try {
 			await account.execute([
