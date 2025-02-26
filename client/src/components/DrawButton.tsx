@@ -21,8 +21,8 @@ export const DrawButton = ({
 	opponentOfferedDraw,
 	onOpponentOffer,
 }: {
-	matchId: number;
-	playerNumber: number;
+	matchId: number | undefined;
+	playerNumber: number | undefined;
 	opponentOfferedDraw: boolean;
 	onOpponentOffer: () => void;
 }) => {
@@ -52,13 +52,13 @@ export const DrawButton = ({
 	}, [data, loading, playerNumber, onOpponentOffer]);
 
 	const handleDrawOffer = async () => {
-		if (!account) return;
+		if (!account || !matchId) return;
 
 		try {
 			await account.execute([
 				{
 					contractAddress:
-						"0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
+						"0x241ffbd1701f9a934ae44f20709dc9bbb1e931abd21d95ab29f4120f3cf6d0a",
 					entrypoint: "offer_draw",
 					calldata: [matchId],
 				},
@@ -71,7 +71,14 @@ export const DrawButton = ({
 	};
 
 	return (
-		<div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+		<div
+			style={{
+				display: "flex",
+				alignItems: "center",
+				flexDirection: "column",
+				gap: "10px",
+			}}
+		>
 			<button
 				onClick={handleDrawOffer}
 				disabled={isDisabled}

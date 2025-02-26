@@ -19,7 +19,7 @@ pub struct GameMatch {
 
     pub last_move_timestamp: u64,
 
-    pub move_count: u32,  // счётчик ходов
+    pub move_count: u32,  
 
     pub winner: ContractAddress,
     pub draw_offered_by_p1: bool,

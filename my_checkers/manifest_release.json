@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
-      "class_hash": "0x75d4660b8db3a2bfb7cee23c806ae8cb957ad298cd0c55cafcdafa8e433b0be",
+      "address": "0x241ffbd1701f9a934ae44f20709dc9bbb1e931abd21d95ab29f4120f3cf6d0a",
+      "class_hash": "0x560f8ff2a4aa04269cea7b809c341fa013e228cabfd2a0fefd3b02e10b34115",
       "abi": [
         {
           "type": "impl",
@@ -1498,8 +1498,8 @@
       ]
     },
     {
-      "address": "0x4fc3b7a38f6f83fc30c8dc5ae6f28088fbd47aa6147aaac11df80ac39bd646f",
-      "class_hash": "0x388a596e3684db1bc5a3ac70bdbea4596eeeea6c74a59e2683a78930b1cf1d9",
+      "address": "0x2e5815d9bdeccb965cab20e59b990390850ea66718a6dfe8205641631124965",
+      "class_hash": "0x687e181148c352aab22eacd3b373fd7e08e7cf4ca423e2e581ce3f93738c693",
       "abi": [
         {
           "type": "impl",
@@ -1583,6 +1583,13 @@
                   "type": "my_checkers::models::enums::GameType"
                 }
               ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "leave_queue",
+              "inputs": [],
               "outputs": [],
               "state_mutability": "external"
             }
@@ -1708,6 +1715,7 @@
       "selector": "0x3f269b48984505d5fb6492f1fba58a96801397786d5cc39772d6d5ad0c54798",
       "systems": [
         "join_queue",
+        "leave_queue",
         "upgrade"
       ]
     }
@@ -1762,6 +1770,12 @@
       "class_hash": "0x7364cd778a74058400c125ce13ac2d41b803663357ec5e2ba17340ad2936439",
       "tag": "my_checkers-MoveMade",
       "selector": "0x1f826a08f38764fc989d6644aa46867c78274132585e79b12ad04ea45ed2826"
+    },
+    {
+      "members": [],
+      "class_hash": "0x473f41817d201944d049b61ead8d940778917a67f173d817fa095aef4084ef8",
+      "tag": "my_checkers-QueueLeft",
+      "selector": "0x355d29a59ab24a5bd622afd0938eeab054cb59622a21ed9aaf2e9ebacc6287a"
     }
   ]
 }

@@ -4,23 +4,12 @@ import { createClient } from "graphql-ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
 const httpLink = new HttpLink({
-	uri: "https://api.cartridge.gg/x/mammo-checkers/torii/graphql",
+	uri: "http://localhost:8080/torii/graphql",
 });
 
 const wsLink = new GraphQLWsLink(
 	createClient({
-		url: "wss://api.cartridge.gg/x/mammo-checkers/torii/graphql",
-		on: {
-			connected: (socket, payload) => {
-				console.log("WS connected:", payload);
-			},
-			error: (err) => {
-				console.error("WS error:", err);
-			},
-			closed: (event) => {
-				console.log("WS closed:", event);
-			},
-		},
+		url: "ws://localhost:8080/torii/graphql",
 	})
 );
 
@@ -40,4 +29,3 @@ export const apolloClient = new ApolloClient({
 	link: splitLink,
 	cache: new InMemoryCache(),
 });
-console.log("init");
