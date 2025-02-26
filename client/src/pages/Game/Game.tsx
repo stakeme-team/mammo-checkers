@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Unity, useUnityContext } from "react-unity-webgl";
-import { useNavigate, useLocation } from "react-router-dom";
 import { MoveMadeSubscription } from "../../components/EventsSubscription";
 import { DrawSubscription } from "../../components/DrawSubscription";
 import { WatchMatch } from "../../components/WatchMatch";
@@ -10,15 +9,17 @@ import { CHECK_PLAYER2_MATCHES } from "../../graphql/checkPlayer2Matches";
 import { CHECK_PLAYER1_MATCHES } from "../../graphql/checkPlayer1Matches";
 import { CHECK_QUEUE_QUERY } from "../../graphql/checkQueueQuery";
 import { DrawButton } from "../../components/DrawButton";
+import { ReactUnityEventParameter } from "react-unity-webgl/distribution/types/react-unity-event-parameters";
+import { useNavigate } from "react-router-dom";
 
 export const Game = () => {
-	const [readyMatch, setReady] = useState<boolean>(false);
 	const [matchData, setMatchData] = useState<{
 		player: number;
 		current_turn: number;
 		match_id: number;
 		game_type: string;
 	} | null>(null);
+	const navigate = useNavigate();
 
 	const { account } = useAccount();
 	const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
@@ -64,7 +65,7 @@ export const Game = () => {
 			if (!account) return;
 
 			try {
-				const result = await account.execute([
+				await account.execute([
 					{
 						contractAddress:
 							"0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
@@ -72,7 +73,6 @@ export const Game = () => {
 						calldata: [matchId, fromX, fromY, toX, toY],
 					},
 				]);
-				console.log(result);
 			} catch (e) {
 				console.error(e);
 			}
@@ -85,7 +85,6 @@ export const Game = () => {
 			if (!account) return;
 
 			try {
-				// Преобразуем steps в массив кортежей
 				const formattedSteps = [];
 				for (let i = 0; i < steps.length; i += 4) {
 					formattedSteps.push([
@@ -96,8 +95,7 @@ export const Game = () => {
 					]);
 				}
 
-				console.log(formattedSteps.length, ...formattedSteps.flat());
-				const result = await account.execute([
+				await account.execute([
 					{
 						contractAddress:
 							"0x4ac0fb7565427c29a9503e68398a4e576cd9eed790fe516e7404c68c124e85f",
@@ -109,7 +107,6 @@ export const Game = () => {
 						],
 					},
 				]);
-				console.log(result);
 			} catch (e) {
 				console.error(e);
 			}
@@ -118,11 +115,31 @@ export const Game = () => {
 	);
 
 	useEffect(() => {
-		addEventListener("MovePiece", handleMovePiece);
-		addEventListener("MoveCornerPiece", handleMoveCornerPiece);
+		addEventListener(
+			"MovePiece",
+			handleMovePiece as unknown as (
+				...args: ReactUnityEventParameter[]
+			) => ReactUnityEventParameter
+		);
+		addEventListener(
+			"MoveCornerPiece",
+			handleMoveCornerPiece as unknown as (
+				...args: ReactUnityEventParameter[]
+			) => ReactUnityEventParameter
+		);
 		return () => {
-			removeEventListener("MovePiece", handleMovePiece);
-			removeEventListener("MoveCornerPiece", handleMoveCornerPiece);
+			removeEventListener(
+				"MovePiece",
+				handleMovePiece as unknown as (
+					...args: ReactUnityEventParameter[]
+				) => ReactUnityEventParameter
+			);
+			removeEventListener(
+				"MoveCornerPiece",
+				handleMoveCornerPiece as unknown as (
+					...args: ReactUnityEventParameter[]
+				) => ReactUnityEventParameter
+			);
 		};
 	}, [
 		addEventListener,
@@ -139,25 +156,21 @@ export const Game = () => {
 				"InitPlayer",
 				`${player},${current_turn},${match_id},${game_type}`
 			);
-
-			// Добавляем подписку на DrawSubscription при запуске Unity
 		}
 	}, [isLoaded, matchData, sendMessage]);
 
 	useEffect(() => {
 		execute();
+		if (!matchData) navigate("/");
 	}, [player1Matches, player2Matches]);
 
 	const execute = useCallback(async () => {
 		if (!account) return;
 
-		// Проверка очереди
 		if (queueData?.myCheckersMatchQueueModels?.edges?.length > 0) {
-			setReady(true);
 			return;
 		}
 
-		// Проверка матчей где игрок player2
 		if (player2Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
 			const matchData = player2Matches.myCheckersGameMatchModels.edges[0].node;
 			if (matchData.status === "InProgress") {
@@ -167,15 +180,11 @@ export const Game = () => {
 					match_id: matchData.match_id,
 					game_type: matchData.game_type,
 				});
-				setReady(true);
 				return;
 			}
 		}
-
-		// Проверка матчей где игрок player1
 		if (player1Matches?.myCheckersGameMatchModels?.edges?.length > 0) {
 			const matchData = player1Matches.myCheckersGameMatchModels.edges[0].node;
-			console.log(matchData);
 			if (matchData.status === "InProgress") {
 				setMatchData({
 					player: 1,
@@ -183,7 +192,6 @@ export const Game = () => {
 					match_id: matchData.match_id,
 					game_type: matchData.game_type,
 				});
-				setReady(true);
 				return;
 			}
 		}
@@ -192,12 +200,11 @@ export const Game = () => {
 	const handleDrawOffer = (matchId: number, playerAddress: string) => {
 		if (account?.address !== playerAddress) {
 			setOpponentOfferedDraw(true);
+			matchId;
 		}
 	};
 
 	if (!account) return null;
-
-	console.log(matchData);
 
 	return (
 		<div
@@ -208,47 +215,48 @@ export const Game = () => {
 				alignItems: "center",
 			}}
 		>
-			<>
-				<div
+			<div
+				style={{
+					width: 800,
+					height: 800,
+					backgroundImage: 'url("../../../public/images/CHECKER_BORDER.png")',
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Unity
+					unityProvider={unityProvider}
 					style={{
-						width: 800,
-						height: 800,
-						backgroundImage: 'url("../../../public/images/CHECKER_BORDER.png")',
-						backgroundSize: "cover",
-						backgroundPosition: "center",
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
+						width: "610px",
+						height: "610px",
+						marginLeft: "25px",
+						borderRadius: "8px",
 					}}
-				>
-					<Unity
-						unityProvider={unityProvider}
-						style={{
-							width: "610px",
-							height: "610px",
-							marginLeft: "25px",
-							borderRadius: "8px",
-						}}
-					/>
-					<MoveMadeSubscription
-						match_id={matchData?.match_id}
-						address={account.address}
-						sendMessage={sendMessage}
-					/>
-				</div>
-				<WatchMatch
-					matchId={String(matchData?.match_id)}
-					playerNumber={matchData?.player}
 				/>
+				<MoveMadeSubscription
+					match_id={matchData?.match_id}
+					address={account.address}
+					sendMessage={sendMessage}
+				/>
+			</div>
+			<WatchMatch
+				matchId={String(matchData?.match_id)}
+				playerNumber={matchData?.player}
+			/>
 
-				<DrawButton
-					matchId={matchData?.match_id}
-					playerNumber={matchData?.player}
-					opponentOfferedDraw={opponentOfferedDraw}
-					onOpponentOffer={() => setOpponentOfferedDraw(true)}
-				/>
-				<DrawSubscription onDrawOffer={handleDrawOffer} />
-			</>
+			<DrawButton
+				matchId={matchData?.match_id}
+				playerNumber={matchData?.player}
+				opponentOfferedDraw={opponentOfferedDraw}
+				onOpponentOffer={() => setOpponentOfferedDraw(true)}
+			/>
+			<DrawSubscription
+				matchId={matchData?.match_id}
+				onDrawOffer={handleDrawOffer}
+			/>
 		</div>
 	);
 };

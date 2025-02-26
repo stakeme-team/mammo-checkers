@@ -1,5 +1,4 @@
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
-import { useEffect, useState } from "react";
 import ControllerConnector from "@cartridge/connector/controller";
 import { Button } from "@cartridge/ui-next";
 
@@ -8,29 +7,8 @@ export function ConnectWallet() {
 	const { disconnect } = useDisconnect();
 	const { address } = useAccount();
 	const controller = connectors[0] as ControllerConnector;
-	const [username, setUsername] = useState<string>();
-
-	useEffect(() => {
-		if (!address) return;
-		controller.username()?.then((n) => setUsername(n));
-	}, [address, controller]);
 
 	return (
-		// <div>
-		// 	{address && (
-		// 		<>
-		// 			<p>Account: {address}</p>
-		// 			{username && <p>Username: {username}</p>}
-		// 		</>
-		// 	)}
-		// 	{address ? (
-		// 		<Button onClick={() => disconnect()}>Disconnect</Button>
-		// 	) : (
-		// <Button onClick={() => connect({ connector: controller })}>
-		// 	Connect
-		// </Button>
-		// 	)}
-		// </div>
 		<>
 			<h1
 				style={{
@@ -40,22 +18,53 @@ export function ConnectWallet() {
 					userSelect: "none",
 				}}
 			>
-				<span style={{ fontSize: "120px", lineHeight: "50px" }}>mammo</span>
+				<span style={{ fontSize: "120px" }}>mammo</span>
 				<span style={{ fontSize: "110px" }}>checkers</span>
 			</h1>
 
-			{address ? (
-				<Button style={{ background: "none" }} onClick={() => disconnect()}>
-					Disconnect
-				</Button>
-			) : (
-				<Button
-					style={{ background: "none" }}
-					onClick={() => connect({ connector: controller })}
-				>
-					Connect
-				</Button>
-			)}
+			<div style={{ position: "absolute", right: "20px", top: "20px" }}>
+				{address ? (
+					<Button
+						style={{
+							background: "#7240D7",
+							display: "flex",
+							alignItems: "center",
+							gap: "5px",
+							borderRadius: "30px	",
+							padding: "15px 20px",
+						}}
+						onClick={() => disconnect()}
+					>
+						Disconnect{" "}
+						{address && (
+							<p
+								style={{
+									margin: "0",
+									overflow: "hidden",
+									maxWidth: "60px",
+									textOverflow: "ellipsis",
+								}}
+							>
+								{address}
+							</p>
+						)}
+					</Button>
+				) : (
+					<Button
+						style={{
+							background: "#7240D7",
+							display: "flex",
+							alignItems: "center",
+							gap: "5px",
+							borderRadius: "30px	",
+							padding: "15px 20px",
+						}}
+						onClick={() => connect({ connector: controller })}
+					>
+						Connect
+					</Button>
+				)}
+			</div>
 		</>
 	);
 }

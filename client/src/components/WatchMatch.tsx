@@ -4,7 +4,6 @@ import { lookupAddresses } from "@cartridge/controller";
 import { redirect, useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import { useAccount } from "@starknet-react/core";
-import { SUBSCRIBE_DRAW_OFFERED } from "./DrawSubscription";
 
 const SUBSCRIBE_ONE_MATCH = gql`
 	subscription WatchOneMatch {
@@ -26,21 +25,13 @@ const SUBSCRIBE_ONE_MATCH = gql`
 
 interface WatchMatchProps {
 	matchId: string;
-	playerNumber: number;
+	playerNumber: number | undefined;
 }
 
 export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 	const navigate = useNavigate();
 	const { account } = useAccount();
 	const drawOfferedRef = useRef(false);
-
-	const { data: offerData } = useSubscription(SUBSCRIBE_DRAW_OFFERED, {
-		variables: { matchId },
-		// skip: !matchId,
-		fetchPolicy: "network-only",
-	});
-
-	console.log(offerData);
 
 	const skip = !matchId;
 	const [isMatchOverForDraw, setMatchOverForDraw] = useState<boolean>(false);
@@ -49,7 +40,6 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 
 	const [isDrawRequested, setIsDrawRequested] = useState<boolean>();
 	const { data, loading, error } = useSubscription(SUBSCRIBE_ONE_MATCH, {
-		// variables: { id: matchId },
 		skip,
 		fetchPolicy: "network-only",
 	});
@@ -84,30 +74,19 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 	};
 
 	useEffect(() => {
-		if (data) console.log(data?.eventMessageUpdated);
 		if (error) {
 			console.error("Ошибка подписки WatchOneMatch:", error);
 			return;
 		}
 
 		if (!loading && data) {
-			console.log("Обновление матча:", matchId, data);
 			const entity = data.entityUpdated;
 			if (entity && entity.models?.length > 0) {
 				const matchModel = entity.models.find(
 					(m: any) => m.__typename === "my_checkers_GameMatch"
 				);
-				console.log(matchModel, matchId);
 
-				// if (matchModel.match_id == matchId) {
 				if (matchModel) {
-					console.log(
-						"Статус матча:",
-						matchModel.status,
-						"Победитель:",
-						matchModel.winner
-					);
-
 					if (!matchModel.winner || matchModel.status === "Finished") {
 						setIsDrawRequested(false);
 						handleMatchResult(matchModel);
@@ -118,25 +97,20 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 						setIsModalOpen(true);
 						setMatchOverForDraw(true);
 					} else if (
-						!drawOfferedRef.current && // Проверка, было ли уже вызвано
+						!drawOfferedRef.current &&
 						((playerNumber === 1 && matchModel.draw_offered_by_p2) ||
 							(playerNumber === 2 && matchModel.draw_offered_by_p1))
 					) {
-						console.log("Draw offered" + `playerNumber: ${playerNumber}`);
-
 						setIsDrawRequested(true);
 						setIsModalOpen(true);
-						drawOfferedRef.current = true; // Блокируем повторные вызовы
+						drawOfferedRef.current = true;
 					}
 				}
 			}
 		}
 	}, [loading, data, error, matchId, navigate]);
 
-	console.log("watch match: " + JSON.stringify(data));
-
 	if (skip) return null;
-	// return <div>Отслеживание матча с ID: {matchId}</div>;
 	return (
 		<Modal
 			isOpen={isModalOpen}

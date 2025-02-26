@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAccount } from "@starknet-react/core";
 import { gql, useSubscription } from "@apollo/client";
 
@@ -19,7 +19,7 @@ export const DrawSubscription = ({
 	matchId,
 	onDrawOffer,
 }: {
-	matchId: number;
+	matchId: number | undefined;
 	onDrawOffer: (matchId: number, playerAddress: string) => void;
 }) => {
 	const { account } = useAccount();
@@ -36,7 +36,6 @@ export const DrawSubscription = ({
 
 		if (!loading && data) {
 			const { models } = data.eventMessageUpdated;
-			console.log(models);
 
 			if (models && models.length > 0) {
 				const drawOffer = models.find(
@@ -45,7 +44,6 @@ export const DrawSubscription = ({
 				);
 
 				if (drawOffer && drawOffer.player !== account?.address) {
-					console.log("Draw offered detected:", drawOffer);
 					onDrawOffer(drawOffer.match_id, drawOffer.player);
 				}
 			}

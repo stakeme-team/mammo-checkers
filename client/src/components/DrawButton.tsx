@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAccount } from "@starknet-react/core";
 import { gql, useQuery } from "@apollo/client";
 
@@ -21,8 +21,8 @@ export const DrawButton = ({
 	opponentOfferedDraw,
 	onOpponentOffer,
 }: {
-	matchId: number;
-	playerNumber: number;
+	matchId: number | undefined;
+	playerNumber: number | undefined;
 	opponentOfferedDraw: boolean;
 	onOpponentOffer: () => void;
 }) => {
@@ -52,7 +52,7 @@ export const DrawButton = ({
 	}, [data, loading, playerNumber, onOpponentOffer]);
 
 	const handleDrawOffer = async () => {
-		if (!account) return;
+		if (!account || !matchId) return;
 
 		try {
 			await account.execute([
