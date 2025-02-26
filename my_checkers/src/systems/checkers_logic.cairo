@@ -356,10 +356,10 @@ pub fn can_king_capture_more(
     piece: BoardPiece
 ) -> bool {
     let directions = array![
-        (-1_i8, -1_i8),  // вверх-влево
-        (-1_i8, 1_i8),   // вверх-вправо
-        (1_i8, -1_i8),   // вниз-влево
-        (1_i8, 1_i8)     // вниз-вправо
+        (-1_i8, -1_i8),
+        (-1_i8, 1_i8), 
+        (1_i8, -1_i8),
+        (1_i8, 1_i8)
     ];
 
     let mut can_continue = false;
