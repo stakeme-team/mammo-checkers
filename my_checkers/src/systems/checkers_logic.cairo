@@ -29,7 +29,12 @@ pub fn execute_classic_move(
     world.write_model(@piece);
 
     if is_capture {
-        let can_continue = can_piece_capture_more_classic(ref world, gm.match_id, piece);
+        let can_continue = if is_king_move {
+            println!("king_capture more?");
+            can_king_capture_more(ref world, gm.match_id, piece)
+        } else {
+            can_piece_capture_more(ref world, gm.match_id, piece)
+        };
         if can_continue {
             gm.chain_capture_in_progress = true;
             return gm;
@@ -41,7 +46,6 @@ pub fn execute_classic_move(
     gm.last_move_timestamp = get_block_timestamp();
     gm
 }
-
 
 pub fn execute_corner_multi_moves(
     ref world: WorldStorage,
@@ -208,30 +212,19 @@ pub fn validate_classic_move(
     let dy = if to_y > piece.y { to_y - piece.y } else { piece.y - to_y };
 
     let is_king = (piece.piece_type == 3_u8) || (piece.piece_type == 4_u8);
-    
-    if gm.chain_capture_in_progress {
-        let must_continue_piece = find_piece_that_must_continue(ref world, gm.match_id, gm.current_turn);
-        assert!(must_continue_piece.is_some(), "Invalid move: No valid capturing piece found.");
 
-        let required_piece = must_continue_piece.unwrap();
-        assert!(
-            piece.x == required_piece.x && piece.y == required_piece.y,
-            "Invalid move: You must continue capturing with the same piece."
-        );
-    } else {
-        if !is_king {
-            let is_capture = dx == 2_u8 && dy == 2_u8;
+    if !is_king {
+        let is_capture = dx == 2_u8 && dy == 2_u8;
 
-            if !is_capture {
-                if piece.owner == 1_u8 {
-                    assert!(to_x < piece.x, "Invalid move: Player 1 non-king must move upwards (to_x must be less than current x)");
-                } else {
-                    assert!(to_x > piece.x, "Invalid move: Player 2 non-king must move downwards (to_x must be greater than current x)");
-                }
+        if !is_capture {
+            if piece.owner == 1_u8 {
+                assert!(to_x < piece.x, "Invalid move: Player 1 non-king must move upwards (to_x must be less than current x)");
+            } else {
+                assert!(to_x > piece.x, "Invalid move: Player 2 non-king must move downwards (to_x must be greater than current x)");
             }
         }
     }
-
+    
     if !is_king {
         assert!(dx == dy, "Invalid move: Move must be diagonal (dx must equal dy)");
         if dx == 1_u8 {
@@ -250,6 +243,7 @@ pub fn validate_classic_move(
     } else {
         assert!(dx == dy, "Invalid move: King must move diagonally (dx must equal dy)");
         let is_cap = is_king_capture(ref world, piece, to_x, to_y);
+        println!("is_king_capture result: {}", is_cap);
         return (is_cap, true); 
     }
     (false, false) 
@@ -292,7 +286,8 @@ pub fn is_king_capture(
     count_enemy == 1
 }
 
-pub fn can_piece_capture_more_classic(
+
+pub fn can_piece_capture_more(
     ref world: WorldStorage,
     match_id: u32,
     piece: BoardPiece
@@ -353,6 +348,60 @@ pub fn can_piece_capture_more_classic(
     };
 
     can_continue 
+}
+
+pub fn can_king_capture_more(
+    ref world: WorldStorage,
+    match_id: u32,
+    piece: BoardPiece
+) -> bool {
+    let directions = array![
+        (-1_i8, -1_i8),  // вверх-влево
+        (-1_i8, 1_i8),   // вверх-вправо
+        (1_i8, -1_i8),   // вниз-влево
+        (1_i8, 1_i8)     // вниз-вправо
+    ];
+
+    let mut can_continue = false;
+
+    for (dx, dy) in directions.span() {
+        let dx: i8 = (*dx).try_into().unwrap();
+        let dy: i8 = (*dy).try_into().unwrap();
+
+        let mut x: i8 = piece.x.try_into().unwrap();
+        let mut y: i8 = piece.y.try_into().unwrap();
+
+        loop {
+            x += dx;
+            y += dy;
+
+            if x < 0 || x > 7 || y < 0 || y > 7 {
+                break;
+            }
+
+            let mid_x = ((piece.x.try_into().unwrap() + x.try_into().unwrap()) / 2);
+            let mid_y = ((piece.y.try_into().unwrap() + y.try_into().unwrap()) / 2);
+            
+
+            let mid_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
+
+            if mid_opt.is_some() {
+                let mid_piece = mid_opt.unwrap();
+
+                if mid_piece.owner != piece.owner {
+                    let dest_opt = find_piece_by_coords(ref world, match_id, x.try_into().unwrap(), y.try_into().unwrap());
+
+                    if dest_opt.is_none() {
+                        can_continue = true;
+
+                        break; 
+                    }
+                }
+            }
+        }
+    };
+
+    can_continue
 }
 
 pub fn maybe_promote_classic_king(piece: BoardPiece) -> BoardPiece {
@@ -424,7 +473,13 @@ pub fn find_piece_that_must_continue(
         let piece: BoardPiece = world.read_model((match_id, pid));
 
         if piece.owner == current_turn {
-            let can_continue = can_piece_capture_more_classic(ref world, match_id, piece);
+            let is_king_move = piece.piece_type == 3_u8 || piece.piece_type == 4_u8;
+
+            let can_continue = if is_king_move {
+                can_king_capture_more(ref world, match_id, piece)
+            } else {
+                can_piece_capture_more(ref world, match_id, piece)
+            };
 
             if can_continue {
                 println!("can continue {:?}", can_continue);
@@ -491,7 +546,6 @@ pub fn remove_captured_piece(
         }
     }
 }
-
 
 fn count_pieces(ref world: WorldStorage, match_id: u32) -> (u32, u32) {
     let piece_ids = get_all_piece_ids_for_match(ref world, match_id);
