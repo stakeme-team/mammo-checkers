@@ -22,11 +22,22 @@ pub mod queue_system {
     #[abi(embed_v0)]
     impl QueueSystemImpl of IQueueSystem<ContractState> {
         fn join_queue(ref self: ContractState, game_type: GameType) {
-            let mut world = self.world_default();  // Получаем world
-            let mut classic_queue: MatchQueue = world.read_model(0);  // Очередь классических шашек
-            let mut corner_queue: MatchQueue = world.read_model(1);   // Очередь уголков
+            let mut world = self.world_default(); 
+            let mut classic_queue: MatchQueue = world.read_model(0);  
+            let mut corner_queue: MatchQueue = world.read_model(1);   
             let caller: ContractAddress = get_caller_address();
-            // TODO: Добавить проверку, что сам к себе в очередь не присоединяется
+           
+           if game_type == GameType::ClassicCheckers {
+                assert!(classic_queue.waiting_count == 0 || classic_queue.first_player != caller, "You cannot join your own queue for Classic Checkers");
+            } else if game_type == GameType::CornerCheckers {
+                assert!(corner_queue.waiting_count == 0 || corner_queue.first_player != caller, "You cannot join your own queue for Corner Checkers");
+            }
+
+            if game_type == GameType::ClassicCheckers {
+                assert!(corner_queue.waiting_count == 0 || corner_queue.first_player != caller, "You cannot join Corner Checkers queue while already in Classic Checkers queue");
+            } else if game_type == GameType::CornerCheckers {
+                assert!(classic_queue.waiting_count == 0 || classic_queue.first_player != caller, "You cannot join Classic Checkers queue while already in Corner Checkers queue");
+            }
     
             println!("join_queue called: caller = {:?}, game_type = {:?}", caller, game_type);
     
@@ -82,7 +93,6 @@ pub mod queue_system {
         }
     }
 
-    // Создание новой партии
     fn create_new_game(ref world: WorldStorage, p1: ContractAddress, p2: ContractAddress, g_type: GameType) {
         let mut match_counter: MatchIDCounter = world.read_model(0);
         let match_id_u32: u32 = match_counter.next_id;
