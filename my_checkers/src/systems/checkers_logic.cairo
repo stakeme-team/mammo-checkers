@@ -14,16 +14,20 @@ pub fn execute_classic_move(
     to_x: u8,
     to_y: u8
 ) -> GameMatch {
-    let (is_capture, _nsteps) = validate_classic_move(ref world, gm, piece, to_x, to_y);
+    let (is_capture, is_king_move) = validate_classic_move(ref world, gm, piece, to_x, to_y);
+    
     if is_capture {
         println!("execute capture");
-        remove_captured_piece(ref world, gm.match_id, piece.x, piece.y, to_x, to_y);
+        remove_captured_piece(ref world, gm.match_id, piece.x, piece.y, to_x, to_y, is_king_move);
     }
+    
     piece.x = to_x;
     piece.y = to_y;
     
     piece = maybe_promote_classic_king(piece);
+
     world.write_model(@piece);
+
     if is_capture {
         let can_continue = can_piece_capture_more_classic(ref world, gm.match_id, piece);
         if can_continue {
@@ -31,11 +35,13 @@ pub fn execute_classic_move(
             return gm;
         }
     }
+
     gm.chain_capture_in_progress = false;
     gm.current_turn = if gm.current_turn == 1_u8 { 2_u8 } else { 1_u8 };
     gm.last_move_timestamp = get_block_timestamp();
     gm
 }
+
 
 pub fn execute_corner_multi_moves(
     ref world: WorldStorage,
@@ -190,24 +196,21 @@ pub fn validate_classic_move(
     piece: BoardPiece,
     to_x: u8,
     to_y: u8
-) -> (bool, u8) {
+) -> (bool, bool) { 
     if to_x > 7_u8 || to_y > 7_u8 {
         assert!(false, "Invalid move: Destination coordinates out of bounds");
     }
+
     let dest_opt = find_piece_by_coords(ref world, piece.match_id, to_x, to_y);
     assert!(dest_opt.is_none(), "Invalid move: Destination square is occupied");
 
     let dx = if to_x > piece.x { to_x - piece.x } else { piece.x - to_x };
     let dy = if to_y > piece.y { to_y - piece.y } else { piece.y - to_y };
-    println!("dx {:?}", dx);
-    println!("dy {:?}", dy);
 
     let is_king = (piece.piece_type == 3_u8) || (piece.piece_type == 4_u8);
     
     if gm.chain_capture_in_progress {
-        println!("ischaincapt");
         let must_continue_piece = find_piece_that_must_continue(ref world, gm.match_id, gm.current_turn);
-        println!("mst_continue");
         assert!(must_continue_piece.is_some(), "Invalid move: No valid capturing piece found.");
 
         let required_piece = must_continue_piece.unwrap();
@@ -232,7 +235,7 @@ pub fn validate_classic_move(
     if !is_king {
         assert!(dx == dy, "Invalid move: Move must be diagonal (dx must equal dy)");
         if dx == 1_u8 {
-            return (false, 1_u8);
+            return (false, false); 
         } else if dx == 2_u8 {
             let mid_x = (piece.x + to_x) / 2;
             let mid_y = (piece.y + to_y) / 2;
@@ -240,18 +243,18 @@ pub fn validate_classic_move(
             assert!(mid_opt.is_some(), "Invalid capture: No piece found in the middle square to capture");
             let mid_piece = mid_opt.unwrap();
             assert!(mid_piece.owner != piece.owner, "Invalid capture: Cannot capture your own piece");
-            return (true, 2_u8);
+            return (true, false); 
         } else {
             assert!(false, "Invalid move: Move distance not allowed for a non-king piece");
         }
     } else {
-        println!("is_king:true");
         assert!(dx == dy, "Invalid move: King must move diagonally (dx must equal dy)");
         let is_cap = is_king_capture(ref world, piece, to_x, to_y);
-        return (is_cap, dx);
+        return (is_cap, true); 
     }
-    (false, 0_u8)
+    (false, false) 
 }
+
 
 pub fn is_king_capture(
     ref world: WorldStorage,
@@ -264,18 +267,29 @@ pub fn is_king_capture(
     let mut y = piece.y;
     let step_x: i8 = if to_x > piece.x { 1 } else { -1 };
     let step_y: i8 = if to_y > piece.y { 1 } else { -1 };
+
+    println!("Starting position x: {:?}, y: {:?}", x, y);
+    println!("Target position x: {:?}, y: {:?}", to_x, to_y);
+
     while x != to_x && y != to_y {
         x = (x.try_into().unwrap() + step_x).try_into().unwrap();
         y = (y.try_into().unwrap() + step_y).try_into().unwrap();
+
         let mid_opt = find_piece_by_coords(ref world, piece.match_id, x, y);
+
         if mid_opt.is_some() {
             let midp = mid_opt.unwrap();
-            assert!(midp.owner != piece.owner, "Invalid king capture: Encountered your own piece during capture path");
+            assert!(midp.owner != piece.owner, "Error: A king cannot capture its own piece");
+
             count_enemy += 1;
+
+            assert!(count_enemy <= 1, "Error: There are more than one piece to capture on the path");
+            continue; 
         }
-        assert!(count_enemy <= 1, "Invalid king move: More than one enemy piece encountered in the path");
     };
-    count_enemy == 1_u8
+
+    println!("Number of enemy pieces captured on the path: {:?}", count_enemy);
+    count_enemy == 1
 }
 
 pub fn can_piece_capture_more_classic(
@@ -431,16 +445,53 @@ pub fn remove_captured_piece(
     from_x: u8,
     from_y: u8,
     to_x: u8,
-    to_y: u8
+    to_y: u8,
+    is_king_move: bool 
 ) {
-    let mid_x = (from_x + to_x) / 2;
-    let mid_y = (from_y + to_y) / 2;
-    let captured_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
-    if captured_opt.is_some() {
-        let captured = captured_opt.unwrap();
-        world.erase_model(@captured);
+    if !is_king_move {
+        let mid_x: u8 = (from_x + to_x) / 2;
+        let mid_y: u8 = (from_y + to_y) / 2;
+        let captured_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
+        
+        if captured_opt.is_some() {
+            let captured = captured_opt.unwrap();
+            println!("Removing captured piece at ({}, {})", mid_x, mid_y);
+            world.erase_model(@captured);
+        } else {
+            println!("No piece to capture at ({}, {})", mid_x, mid_y);
+        }
+    } else {
+        let dx: i8 = if to_x > from_x { 1 } else { -1 };
+        let dy: i8 = if to_y > from_y { 1 } else { -1 };
+        let mut x: i8 = from_x.try_into().unwrap();
+        let mut y: i8 = from_y.try_into().unwrap();
+        
+        let mut captured_found = false; 
+        
+        while x != to_x.try_into().unwrap() && y != to_y.try_into().unwrap() {
+            x += dx;
+            y += dy;
+
+            let mid_x: u8 = x.try_into().unwrap();
+            let mid_y: u8 = y.try_into().unwrap();
+            
+            let mid_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
+            
+            if mid_opt.is_some() {
+                let mid_piece = mid_opt.unwrap();
+                if mid_piece.owner != from_x {
+                    println!("Removing captured piece at ({}, {})", mid_x, mid_y);
+                    world.erase_model(@mid_piece);
+                    captured_found = true; 
+                }
+            }
+        };
+        if !captured_found {
+            println!("No valid piece found to capture");
+        }
     }
 }
+
 
 fn count_pieces(ref world: WorldStorage, match_id: u32) -> (u32, u32) {
     let piece_ids = get_all_piece_ids_for_match(ref world, match_id);
