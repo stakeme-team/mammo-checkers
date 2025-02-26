@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { MoveMadeSubscription } from "../../components/EventsSubscription";
-import { DrawSubscription } from "../../components/DrawSubscription";
 import { WatchMatch } from "../../components/WatchMatch";
 import { useQuery } from "@apollo/client";
 import { CHECK_PLAYER2_MATCHES } from "../../graphql/checkPlayer2Matches";
@@ -197,13 +196,6 @@ export const Game = () => {
 		}
 	}, [account, queueData, player2Matches, player1Matches]);
 
-	const handleDrawOffer = (matchId: number, playerAddress: string) => {
-		if (account?.address !== playerAddress) {
-			setOpponentOfferedDraw(true);
-			matchId;
-		}
-	};
-
 	if (!account) return null;
 
 	return (
@@ -252,10 +244,6 @@ export const Game = () => {
 				playerNumber={matchData?.player}
 				opponentOfferedDraw={opponentOfferedDraw}
 				onOpponentOffer={() => setOpponentOfferedDraw(true)}
-			/>
-			<DrawSubscription
-				matchId={matchData?.match_id}
-				onDrawOffer={handleDrawOffer}
 			/>
 		</div>
 	);
