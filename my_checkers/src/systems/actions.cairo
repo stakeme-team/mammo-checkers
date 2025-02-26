@@ -11,7 +11,6 @@ pub mod actions {
     use starknet::{get_caller_address, contract_address_const};
     use dojo::model::ModelStorage;
     use dojo::event::EventStorage;
-    // Импорт моделей
     use crate::models::enums::{GameType, GameStatus};
     use crate::models::game_match::{GameMatch, DrawOffered};
     use crate::models::board_piece::MoveMade;
@@ -27,14 +26,13 @@ pub mod actions {
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn make_move(ref self: ContractState, match_id: u32, from_x: u8, from_y: u8, to_x: u8, to_y: u8) {
-            let mut world = self.world_default();  // Получаем world
+            let mut world = self.world_default(); 
             let mut gm: GameMatch = world.read_model(match_id);
             
             assert!(gm.status == GameStatus::InProgress, "Game must be in progress");
 
             assert!(gm.game_type == GameType::ClassicCheckers, "Use corner_make_moves for CornerCheckers");
             
-            // Проверяем, чей ход
             let caller = get_caller_address();
             let current_player_addr = if gm.current_turn == 1_u8 {
                 gm.player1
@@ -44,22 +42,17 @@ pub mod actions {
             
             assert!(caller == current_player_addr, "It's not your turn");
 
-            // Ищем шашку на (from_x, from_y)
             let piece_opt = find_piece_by_coords(ref world, match_id, from_x, from_y);
             assert!(piece_opt.is_some(), "No piece on this square");
             
             let mut piece = piece_opt.unwrap();
-            // Проверяем, что шашка принадлежит текущему игроку
             assert!(piece.owner == gm.current_turn, "This piece does not belong to you");
 
             gm = execute_classic_move(ref world, gm, piece, to_x, to_y);
-            // Увеличиваем счётчик ходов
             gm.move_count += 1;
-            // Проверяем, не наступил ли конец игры (победа / ничья / лимит ходов)
             println!("check win1 {:?}", gm.status);
             gm = check_winner_or_draw(ref world, gm);
             println!("check win2 {:?}", gm.status);
-            // Сохраняем обновленный GameMatch
             world.write_model(@gm);
 
             world.emit_event(@MoveMade {
@@ -72,17 +65,14 @@ pub mod actions {
             });
         }
 
-          /// Мультиход для уголков: список (from_x, from_y, to_x, to_y).
         fn corner_make_moves(ref self: ContractState, match_id: u32, steps: Array<(u8, u8, u8, u8)>) {
             let mut world = self.world_default();
             let mut gm: GameMatch = world.read_model(match_id);
 
-            // 1) Игра должна идти
             assert!(gm.status == GameStatus::InProgress, "Game must be in progress");
 
             assert!(gm.game_type == GameType::CornerCheckers, "corner_make_multi_moves: only for CornerCheckers");
 
-            // 2) Проверяем, что вызывающий адрес = текущий игрок
             let caller = get_caller_address();
             let current_player_addr = if gm.current_turn == 1_u8 {
                 gm.player1
@@ -111,13 +101,9 @@ pub mod actions {
 
             let corner_steps_copy = corner_steps.clone(); 
 
-            // 4) Вызываем нашу функцию, которая сделает все ходы
             gm = execute_corner_multi_moves(ref world, gm, corner_steps);
 
-            // 5) Проверяем, не закончилась ли игра
             gm = check_winner_or_draw(ref world, gm);
-
-            // 6) Сохраняем изменения
             world.write_model(@gm);
 
             for step in corner_steps_copy {
@@ -136,14 +122,11 @@ pub mod actions {
             let mut world = self.world_default();
             let mut gm: GameMatch = world.read_model(match_id);
             
-            // Проверяем, что игра идет
             assert!(gm.status == GameStatus::InProgress, "Game must be in progress");
         
-            // Проверяем, что вызывающий адрес один из игроков матча
             let caller = get_caller_address();
             assert!(caller == gm.player1 || caller == gm.player2, "You must be in this match to offer a draw");
             
-            // Устанавливаем флаг, что игрок согласен на ничью
             if caller == gm.player1 {
                 gm.draw_offered_by_p1 = true;
             } else if caller == gm.player2 {
@@ -155,7 +138,6 @@ pub mod actions {
                 gm.winner = contract_address_const::<0>(); 
                 world.write_model(@gm);
                 
-                // Отправляем событие о ничьей
                 world.emit_event(@DrawOffered {
                     match_id: match_id,
                     player: caller,
