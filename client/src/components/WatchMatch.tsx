@@ -86,7 +86,7 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 					(m: any) => m.__typename === "my_checkers_GameMatch"
 				);
 
-				if (matchModel) {
+				if (matchModel && matchModel.match_id == matchId) {
 					if (!matchModel.winner || matchModel.status === "Finished") {
 						setIsDrawRequested(false);
 						handleMatchResult(matchModel);

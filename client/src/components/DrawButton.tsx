@@ -32,7 +32,6 @@ export const DrawButton = ({
 
 	const { data, loading } = useQuery(CHECK_DRAW_STATUS, {
 		variables: { match_id: matchId },
-		skip: !matchId,
 	});
 
 	useEffect(() => {
