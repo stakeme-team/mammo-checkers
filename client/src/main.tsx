@@ -12,8 +12,8 @@ function App() {
 
 	const backgroundImage =
 		location.pathname === "/"
-			? 'url("../images/MENU_BG.png")'
-			: 'url("../images/GAME_BG.png")';
+			? 'url("/images/MENU_BG.png")'
+			: 'url("/images/GAME_BG.png")';
 
 	return (
 		<div

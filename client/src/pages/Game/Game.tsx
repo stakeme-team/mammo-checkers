@@ -219,7 +219,7 @@ export const Game = () => {
 				style={{
 					width: 800,
 					height: 800,
-					backgroundImage: 'url("../../../public/images/CHECKER_BORDER.png")',
+					backgroundImage: 'url("/images/CHECKER_BORDER.png")',
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					display: "flex",
