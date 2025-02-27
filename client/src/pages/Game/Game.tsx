@@ -217,6 +217,7 @@ export const Game = () => {
 					backgroundSize: "cover",
 					backgroundPosition: "center",
 					display: "flex",
+					flexDirection: "column",
 					alignItems: "center",
 					justifyContent: "center",
 				}}
@@ -228,18 +229,16 @@ export const Game = () => {
 						height: "610px",
 						marginLeft: "25px",
 						borderRadius: "8px",
-						opacity: !waitingTransaction ? "50%" : "100%",
+						opacity: waitingTransaction ? "50%" : "100%",
+						pointerEvents: waitingTransaction ? "none" : "auto",
 					}}
 				/>
-				{!waitingTransaction ? (
-					<MoveMadeSubscription
-						match_id={matchData?.match_id}
-						address={account.address}
-						sendMessage={sendMessage}
-					/>
-				) : (
-					<p>transaction is processing</p>
-				)}
+				<MoveMadeSubscription
+					match_id={matchData?.match_id}
+					address={account.address}
+					sendMessage={sendMessage}
+				/>
+				{waitingTransaction && <p>Transaction is processing</p>}
 			</div>
 			<WatchMatch
 				matchId={String(matchData?.match_id)}
