@@ -100,21 +100,27 @@ export const JoinQueue = () => {
 
 	return (
 		<div>
-			<button
-				onClick={() => execute()}
+			<div
 				style={{
-					background: "#7240D7",
 					display: "flex",
+					flexDirection: "column",
+					marginLeft: "80px",
+					fontSize: "30px",
 					alignItems: "center",
-					gap: "5px",
-					borderRadius: "30px	",
-					padding: "15px 20px",
-					boxShadow:
-						"0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)",
 				}}
 			>
-				new game
-			</button>
+				<button
+					onClick={() => execute()}
+					style={{
+						background: "none",
+					}}
+				>
+					new game
+				</button>
+				<a href="" style={{ color: "#fff" }}>
+					Faucet
+				</a>
+			</div>
 			<MatchCreatedSubscription onMatchCreated={handleMatchCreated} />
 
 			<Modal

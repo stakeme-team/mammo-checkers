@@ -63,7 +63,7 @@ export const Game = () => {
 		) => {
 			if (!account) return;
 			try {
-				await account.execute([
+				const res: any = await account.execute([
 					{
 						contractAddress:
 							"0x72b332110c05573e250228e62f194b5b5050cc11ed302904f799d31c72342b7",
@@ -71,6 +71,12 @@ export const Game = () => {
 						calldata: [matchId, fromX, fromY, toX, toY],
 					},
 				]);
+
+				res.code = "SUCCESS";
+
+				if (res.code === "SUCCESS") {
+					await new Promise((resolve) => setTimeout(resolve, 2000));
+				}
 			} catch (e) {
 				console.error(e);
 			}
@@ -112,34 +118,15 @@ export const Game = () => {
 		[account]
 	);
 	useEffect(() => {
-		const delayedHandleMovePiece = (...args: ReactUnityEventParameter[]) => {
-			setTimeout(
-				() =>
-					handleMovePiece(
-						...(args as unknown as [number, number, number, number, number])
-					),
-				2000
-			);
-		};
-
-		const delayedHandleMoveCornerPiece = (
-			...args: ReactUnityEventParameter[]
-		) => {
-			setTimeout(
-				() => handleMoveCornerPiece(...(args as unknown as [number, number[]])),
-				2000
-			);
-		};
-
 		addEventListener(
 			"MovePiece",
-			delayedHandleMovePiece as unknown as (
+			handleMovePiece as unknown as (
 				...args: ReactUnityEventParameter[]
 			) => ReactUnityEventParameter
 		);
 		addEventListener(
 			"MoveCornerPiece",
-			delayedHandleMoveCornerPiece as unknown as (
+			handleMoveCornerPiece as unknown as (
 				...args: ReactUnityEventParameter[]
 			) => ReactUnityEventParameter
 		);
@@ -147,13 +134,13 @@ export const Game = () => {
 		return () => {
 			removeEventListener(
 				"MovePiece",
-				delayedHandleMovePiece as unknown as (
+				handleMovePiece as unknown as (
 					...args: ReactUnityEventParameter[]
 				) => ReactUnityEventParameter
 			);
 			removeEventListener(
 				"MoveCornerPiece",
-				delayedHandleMoveCornerPiece as unknown as (
+				handleMoveCornerPiece as unknown as (
 					...args: ReactUnityEventParameter[]
 				) => ReactUnityEventParameter
 			);
@@ -178,7 +165,6 @@ export const Game = () => {
 
 	useEffect(() => {
 		execute();
-		//if (!matchData) navigate("/");
 	}, [player1Matches, player2Matches]);
 
 	const execute = useCallback(async () => {

@@ -5,7 +5,7 @@ function Home() {
 	return (
 		<div
 			style={{
-				height: "65vh",
+				height: "70vh",
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
