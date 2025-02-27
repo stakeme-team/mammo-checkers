@@ -39,8 +39,7 @@ export const JoinQueue = () => {
 		try {
 			await account?.execute([
 				{
-					contractAddress:
-						"0x5742582861b7c212c4271d80a1b2867d572c8b4fe26b78c16496b518a1b2988",
+					contractAddress: import.meta.env.VITE_QUEUE_SYSTEM_ADDRESS,
 					entrypoint: "join_queue",
 					calldata: [gameType],
 				},

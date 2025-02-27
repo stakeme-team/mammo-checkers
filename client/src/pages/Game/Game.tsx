@@ -64,8 +64,7 @@ export const Game = () => {
 				setWaitingTransaction(true);
 				const res: any = await account.execute([
 					{
-						contractAddress:
-							"0x72b332110c05573e250228e62f194b5b5050cc11ed302904f799d31c72342b7",
+						contractAddress: import.meta.env.VITE_CONTRACT_ACTIONS_ADDRESS,
 						entrypoint: "make_move",
 						calldata: [matchId, fromX, fromY, toX, toY],
 					},
@@ -99,8 +98,7 @@ export const Game = () => {
 
 				await account.execute([
 					{
-						contractAddress:
-							"0x72b332110c05573e250228e62f194b5b5050cc11ed302904f799d31c72342b7",
+						contractAddress: import.meta.env.VITE_CONTRACT_ACTIONS_ADDRESS,
 						entrypoint: "corner_make_moves",
 						calldata: [
 							matchId,

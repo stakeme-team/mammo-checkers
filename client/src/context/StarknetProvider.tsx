@@ -6,8 +6,7 @@ import { Connector } from "@starknet-react/core";
 import { RpcProvider } from "starknet";
 import { SessionPolicies } from "@cartridge/controller";
 
-const CONTRACT_ACTIONS =
-	"0x72b332110c05573e250228e62f194b5b5050cc11ed302904f799d31c72342b7";
+export const CONTRACT_ACTIONS = import.meta.env.VITE_CONTRACT_ACTIONS_ADDRESS;
 
 const policies: SessionPolicies = {
 	contracts: {
@@ -25,15 +24,15 @@ export const connector = new ControllerConnector({
 	policies,
 	chains: [
 		{
-			rpcUrl: "https://api.cartridge.gg/x/mammo-checkers/katana",
+			rpcUrl: import.meta.env.VITE_NODE_URL,
 		},
 	],
-	defaultChainId: "0x57505f4d414d4d4f5f434845434b455253",
+	defaultChainId: import.meta.env.VITE_DEFAULT_CHAIN_ID,
 }) as never as Connector;
 
 function provider() {
 	return new RpcProvider({
-		nodeUrl: "https://api.cartridge.gg/x/mammo-checkers/katana",
+		nodeUrl: import.meta.env.VITE_NODE_URL,
 	});
 }
 

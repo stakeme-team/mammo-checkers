@@ -1,0 +1,26 @@
+[world]
+name = "Checkers"
+description = "Checkers"
+cover_uri = "file://assets/cover.png"
+icon_uri = "file://assets/icon.png"
+website = "https://github.com/dojoengine/dojo-starter"
+seed = "0"
+
+[world.socials]
+x = "https://x.com/ohayo_dojo"
+discord = "https://discord.gg/FB2wR6uF"
+github = "https://github.com/dojoengine/dojo-starter"
+telegram = "https://t.me/dojoengine"
+
+[namespace]
+default = "my_checkers"
+
+[env]
+rpc_url = "https://api.cartridge.gg/x/mammo-check/katana"
+# Default account for katana with seed = 0
+account_address = "0x1f401c745d3dba9b9da11921d1fb006c96f571e9039a0ece3f3b0dc14f04c3d"
+private_key = "0x7230b49615d175307d580c33d6fda61fc7b9aec91df0f5c1a5ebe3b8cbfee02"
+#world_address = "0x06171ed98331e849d6084bf2b3e3186a7ddf35574dd68cab4691053ee8ab69d7" # Uncomment and update this line with your world address.
+
+[writers]
+"my_checkers" = ["my_checkers-queue_system", "my_checkers-actions"]
