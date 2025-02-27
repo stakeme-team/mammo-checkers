@@ -117,7 +117,12 @@ export const JoinQueue = () => {
 				>
 					new game
 				</button>
-				<a href="" style={{ color: "#fff" }}>
+				<a
+					href="https://www.alchemy.com/faucets/starknet-sepolia"
+					rel="noopener noreferrer"
+					target="_blank"
+					style={{ color: "#fff" }}
+				>
 					Faucet
 				</a>
 			</div>
