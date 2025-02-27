@@ -9,7 +9,6 @@ import { CHECK_PLAYER1_MATCHES } from "../../graphql/checkPlayer1Matches";
 import { CHECK_QUEUE_QUERY } from "../../graphql/checkQueueQuery";
 import { DrawButton } from "../../components/DrawButton";
 import { ReactUnityEventParameter } from "react-unity-webgl/distribution/types/react-unity-event-parameters";
-//import { useNavigate } from "react-router-dom";
 
 export const Game = () => {
 	const [matchData, setMatchData] = useState<{
@@ -18,8 +17,7 @@ export const Game = () => {
 		match_id: number;
 		game_type: string;
 	} | null>(null);
-	//const navigate = useNavigate();
-
+	const [waitingTransaction, setWaitingTransaction] = useState<boolean>(false);
 	const { account } = useAccount();
 	const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
 
@@ -63,6 +61,7 @@ export const Game = () => {
 		) => {
 			if (!account) return;
 			try {
+				setWaitingTransaction(true);
 				const res: any = await account.execute([
 					{
 						contractAddress:
@@ -72,13 +71,12 @@ export const Game = () => {
 					},
 				]);
 
-				res.code = "SUCCESS";
-
 				if (res.code === "SUCCESS") {
-					await new Promise((resolve) => setTimeout(resolve, 2000));
+					setWaitingTransaction(false);
 				}
 			} catch (e) {
 				console.error(e);
+				setWaitingTransaction(false);
 			}
 		},
 		[account]
@@ -230,13 +228,16 @@ export const Game = () => {
 						height: "610px",
 						marginLeft: "25px",
 						borderRadius: "8px",
+						opacity: !waitingTransaction ? "50%" : "100%",
 					}}
 				/>
-				<MoveMadeSubscription
-					match_id={matchData?.match_id}
-					address={account.address}
-					sendMessage={sendMessage}
-				/>
+				{!waitingTransaction && (
+					<MoveMadeSubscription
+						match_id={matchData?.match_id}
+						address={account.address}
+						sendMessage={sendMessage}
+					/>
+				)}
 			</div>
 			<WatchMatch
 				matchId={String(matchData?.match_id)}
