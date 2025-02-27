@@ -62,7 +62,6 @@ export const Game = () => {
 			toY: number
 		) => {
 			if (!account) return;
-
 			try {
 				await account.execute([
 					{
@@ -112,30 +111,49 @@ export const Game = () => {
 		},
 		[account]
 	);
-
 	useEffect(() => {
+		const delayedHandleMovePiece = (...args: ReactUnityEventParameter[]) => {
+			setTimeout(
+				() =>
+					handleMovePiece(
+						...(args as unknown as [number, number, number, number, number])
+					),
+				2000
+			);
+		};
+
+		const delayedHandleMoveCornerPiece = (
+			...args: ReactUnityEventParameter[]
+		) => {
+			setTimeout(
+				() => handleMoveCornerPiece(...(args as unknown as [number, number[]])),
+				2000
+			);
+		};
+
 		addEventListener(
 			"MovePiece",
-			handleMovePiece as unknown as (
+			delayedHandleMovePiece as unknown as (
 				...args: ReactUnityEventParameter[]
 			) => ReactUnityEventParameter
 		);
 		addEventListener(
 			"MoveCornerPiece",
-			handleMoveCornerPiece as unknown as (
+			delayedHandleMoveCornerPiece as unknown as (
 				...args: ReactUnityEventParameter[]
 			) => ReactUnityEventParameter
 		);
+
 		return () => {
 			removeEventListener(
 				"MovePiece",
-				handleMovePiece as unknown as (
+				delayedHandleMovePiece as unknown as (
 					...args: ReactUnityEventParameter[]
 				) => ReactUnityEventParameter
 			);
 			removeEventListener(
 				"MoveCornerPiece",
-				handleMoveCornerPiece as unknown as (
+				delayedHandleMoveCornerPiece as unknown as (
 					...args: ReactUnityEventParameter[]
 				) => ReactUnityEventParameter
 			);
