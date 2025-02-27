@@ -3,7 +3,6 @@ pub mod models {
     pub mod board_piece;
     pub mod game_match;
     pub mod queue;
-    pub mod player;
     pub mod match_id_counter;
 }
 
