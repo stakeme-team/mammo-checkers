@@ -11,8 +11,6 @@ node_modules
 dist
 dist-ssr
 *.local
-client/localhost-key.pem
-client/localhost.pem
 
 # Editor directories and files
 .vscode/*
@@ -24,3 +22,5 @@ client/localhost.pem
 *.njsproj
 *.sln
 *.sw?
+client/localhost-key.pem
+client/localhost.pem
