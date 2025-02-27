@@ -238,7 +238,18 @@ export const Game = () => {
 					address={account.address}
 					sendMessage={sendMessage}
 				/>
-				{waitingTransaction && <p>Transaction is processing</p>}
+				{waitingTransaction && (
+					<p
+						style={{
+							position: "absolute",
+							top: "50%",
+							left: "50%",
+							transform: "translate(-50%, -50%)",
+						}}
+					>
+						Transaction is processing
+					</p>
+				)}
 			</div>
 			<WatchMatch
 				matchId={String(matchData?.match_id)}
