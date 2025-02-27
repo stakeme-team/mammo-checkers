@@ -286,7 +286,6 @@ pub fn is_king_capture(
     count_enemy == 1
 }
 
-
 pub fn can_piece_capture_more(
     ref world: WorldStorage,
     match_id: u32,
@@ -364,6 +363,8 @@ pub fn can_king_capture_more(
 
     let mut can_continue = false;
 
+    println!("Starting king capture check from ({}, {})", piece.x, piece.y);
+
     for (dx, dy) in directions.span() {
         let dx: i8 = (*dx).try_into().unwrap();
         let dy: i8 = (*dy).try_into().unwrap();
@@ -371,35 +372,57 @@ pub fn can_king_capture_more(
         let mut x: i8 = piece.x.try_into().unwrap();
         let mut y: i8 = piece.y.try_into().unwrap();
 
+        println!("Checking direction dx: {}, dy: {}", dx, dy);
+
         loop {
             x += dx;
             y += dy;
 
+            println!("Current position after move: ({}, {})", x, y);
+
             if x < 0 || x > 7 || y < 0 || y > 7 {
+                println!("Out of bounds, breaking loop.");
                 break;
             }
 
-            let mid_x = ((piece.x.try_into().unwrap() + x.try_into().unwrap()) / 2);
-            let mid_y = ((piece.y.try_into().unwrap() + y.try_into().unwrap()) / 2);
-            
+            let coord_check = find_piece_by_coords(ref world, match_id, x.try_into().unwrap(), y.try_into().unwrap());
 
-            let mid_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
+            if coord_check.is_some() {
+                let coord_check = coord_check.unwrap();
+                println!("Found piece at position ({}, {}), owner: {}", x, y, coord_check.owner);
 
-            if mid_opt.is_some() {
-                let mid_piece = mid_opt.unwrap();
-
-                if mid_piece.owner != piece.owner {
+                if coord_check.owner != piece.owner {
+                    x += dx;
+                    y += dy;
+                    if x < 0 || x > 7 || y < 0 || y > 7 {
+                        println!("Out of bounds, breaking loop.");
+                        break;
+                    }
                     let dest_opt = find_piece_by_coords(ref world, match_id, x.try_into().unwrap(), y.try_into().unwrap());
 
                     if dest_opt.is_none() {
+                        println!("Destination ({}, {}) is empty, can continue capture.", x, y);
                         can_continue = true;
-
-                        break; 
+                        break;
+                    } else {
+                        println!("Destination ({}, {}) is occupied.", x, y);
+                        break;
                     }
+                } else {
+                    println!("Found own piece at ({}, {}), cannot capture.", x, y);
+                    break;
                 }
+            } else {
+                println!("No piece found at position ({}, {}).", x, y);
             }
         }
     };
+
+    if can_continue {
+        println!("Capture can continue.");
+    } else {
+        println!("No further capture possible.");
+    }
 
     can_continue
 }
