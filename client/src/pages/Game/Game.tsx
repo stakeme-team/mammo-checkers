@@ -67,7 +67,7 @@ export const Game = () => {
 				await account.execute([
 					{
 						contractAddress:
-							"0x488fb174a5f0e38d578f19e5fdf2a0a5181ad5fcb07848b45090a3a58766411",
+							"0x72b332110c05573e250228e62f194b5b5050cc11ed302904f799d31c72342b7",
 						entrypoint: "make_move",
 						calldata: [matchId, fromX, fromY, toX, toY],
 					},
@@ -97,7 +97,7 @@ export const Game = () => {
 				await account.execute([
 					{
 						contractAddress:
-							"0x488fb174a5f0e38d578f19e5fdf2a0a5181ad5fcb07848b45090a3a58766411",
+							"0x72b332110c05573e250228e62f194b5b5050cc11ed302904f799d31c72342b7",
 						entrypoint: "corner_make_moves",
 						calldata: [
 							matchId,

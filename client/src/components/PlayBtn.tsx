@@ -40,7 +40,7 @@ export const JoinQueue = () => {
 			await account?.execute([
 				{
 					contractAddress:
-						"0x2e5815d9bdeccb965cab20e59b990390850ea66718a6dfe8205641631124965",
+						"0x5742582861b7c212c4271d80a1b2867d572c8b4fe26b78c16496b518a1b2988",
 					entrypoint: "join_queue",
 					calldata: [gameType],
 				},
