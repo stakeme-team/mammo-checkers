@@ -501,13 +501,13 @@ pub fn remove_captured_piece(
     from_y: u8,
     to_x: u8,
     to_y: u8,
-    is_king_move: bool 
+    is_king_move: bool
 ) {
     if !is_king_move {
         let mid_x: u8 = (from_x + to_x) / 2;
         let mid_y: u8 = (from_y + to_y) / 2;
         let captured_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
-        
+
         if captured_opt.is_some() {
             let captured = captured_opt.unwrap();
             println!("Removing captured piece at ({}, {})", mid_x, mid_y);
@@ -520,32 +520,41 @@ pub fn remove_captured_piece(
         let dy: i8 = if to_y > from_y { 1 } else { -1 };
         let mut x: i8 = from_x.try_into().unwrap();
         let mut y: i8 = from_y.try_into().unwrap();
-        
-        let mut captured_found = false; 
-        
+
+        let mut captured_found = false;
+
+        println!("Starting king capture from ({}, {}) to ({}, {})", from_x, from_y, to_x, to_y);
+
         while x != to_x.try_into().unwrap() && y != to_y.try_into().unwrap() {
             x += dx;
             y += dy;
 
             let mid_x: u8 = x.try_into().unwrap();
             let mid_y: u8 = y.try_into().unwrap();
-            
+
+            println!("Checking intermediate position at ({}, {})", mid_x, mid_y);
+
             let mid_opt = find_piece_by_coords(ref world, match_id, mid_x, mid_y);
-            
+
             if mid_opt.is_some() {
                 let mid_piece = mid_opt.unwrap();
-                if mid_piece.owner != from_x {
-                    println!("Removing captured piece at ({}, {})", mid_x, mid_y);
-                    world.erase_model(@mid_piece);
-                    captured_found = true; 
-                }
+                println!("Capturing enemy piece at ({}, {})", mid_x, mid_y);
+                world.erase_model(@mid_piece);
+                captured_found = true; 
+
+            } else {
+                println!("No piece found at intermediate position ({}, {})", mid_x, mid_y);
             }
         };
+
         if !captured_found {
             println!("No valid piece found to capture");
+        } else {
+            println!("Capture successful");
         }
     }
 }
+
 
 fn count_pieces(ref world: WorldStorage, match_id: u32) -> (u32, u32) {
     let piece_ids = get_all_piece_ids_for_match(ref world, match_id);
