@@ -231,12 +231,14 @@ export const Game = () => {
 						opacity: !waitingTransaction ? "50%" : "100%",
 					}}
 				/>
-				{!waitingTransaction && (
+				{!waitingTransaction ? (
 					<MoveMadeSubscription
 						match_id={matchData?.match_id}
 						address={account.address}
 						sendMessage={sendMessage}
 					/>
+				) : (
+					<p>transaction is processing</p>
 				)}
 			</div>
 			<WatchMatch
