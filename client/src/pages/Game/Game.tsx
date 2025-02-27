@@ -240,7 +240,14 @@ export const Game = () => {
 					sendMessage={sendMessage}
 				/>
 				{waitingTransaction && (
-					<p style={{ position: "absolute", top: "50%", left: "50%" }}>
+					<p
+						style={{
+							position: "absolute",
+							top: "50%",
+							left: "50%",
+							transform: "translate(-50%, -50%)",
+						}}
+					>
 						Transaction is processing
 					</p>
 				)}
