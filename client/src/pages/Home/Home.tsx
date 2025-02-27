@@ -5,11 +5,11 @@ function Home() {
 	return (
 		<div
 			style={{
-				height: "70vh",
+				height: "65vh",
 				display: "flex",
 				flexDirection: "column",
 				alignItems: "center",
-				justifyContent: "center",
+				justifyContent: "flex-end",
 			}}
 		>
 			<ConnectWallet />

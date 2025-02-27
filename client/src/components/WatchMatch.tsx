@@ -51,7 +51,7 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 			await account.execute([
 				{
 					contractAddress:
-						"0x241ffbd1701f9a934ae44f20709dc9bbb1e931abd21d95ab29f4120f3cf6d0a",
+						"0x488fb174a5f0e38d578f19e5fdf2a0a5181ad5fcb07848b45090a3a58766411",
 					entrypoint: "offer_draw",
 					calldata: [matchId],
 				},
@@ -76,7 +76,7 @@ export function WatchMatch({ matchId, playerNumber }: WatchMatchProps) {
 	useEffect(() => {
 		if (error) {
 			console.error("Ошибка подписки WatchOneMatch:", error);
-			return;
+			// return;
 		}
 
 		if (!loading && data) {

@@ -10,18 +10,6 @@ export function ConnectWallet() {
 
 	return (
 		<>
-			<h1
-				style={{
-					margin: 0,
-					display: "flex",
-					flexDirection: "column",
-					userSelect: "none",
-				}}
-			>
-				<span style={{ fontSize: "120px" }}>mammo</span>
-				<span style={{ fontSize: "110px" }}>checkers</span>
-			</h1>
-
 			<div style={{ position: "absolute", right: "20px", top: "20px" }}>
 				{address ? (
 					<Button
@@ -32,6 +20,8 @@ export function ConnectWallet() {
 							gap: "5px",
 							borderRadius: "30px	",
 							padding: "15px 20px",
+							boxShadow:
+								"0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)",
 						}}
 						onClick={() => disconnect()}
 					>
@@ -58,6 +48,8 @@ export function ConnectWallet() {
 							gap: "5px",
 							borderRadius: "30px	",
 							padding: "15px 20px",
+							boxShadow:
+								"0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)",
 						}}
 						onClick={() => connect({ connector: controller })}
 					>

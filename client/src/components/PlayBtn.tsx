@@ -102,7 +102,16 @@ export const JoinQueue = () => {
 		<div>
 			<button
 				onClick={() => execute()}
-				style={{ background: "none", fontSize: "24px", marginTop: "10px" }}
+				style={{
+					background: "#7240D7",
+					display: "flex",
+					alignItems: "center",
+					gap: "5px",
+					borderRadius: "30px	",
+					padding: "15px 20px",
+					boxShadow:
+						"0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19)",
+				}}
 			>
 				new game
 			</button>

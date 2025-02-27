@@ -60,10 +60,11 @@ button {
 	font-family: inherit;
 	background-color: #1a1a1a;
 	cursor: pointer;
-	transition: border-color 0.25s;
+	transition: all 0.5s ease-in-out;
 }
 button:hover {
 	border-color: #646cff;
+	background-color: #7240d7;
 }
 button:focus,
 button:focus-visible {
