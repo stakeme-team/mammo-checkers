@@ -13,7 +13,7 @@ Additionally, you need to install the following components:
 1. **Dojo Engine**
     
     ```bash
-    git clone https://github.com/dojoengine/dojo.git
+    curl -L https://install.dojoengine.org | bash
     dojoup
     ```
     
