@@ -2,6 +2,11 @@
 MammoCheckers – A New Era of classic board games on Celestia 🎲✨
 
 > MammoCheckers is a decentralized board game created specifically for the Celestia Hackathon, combining the timeless appeal of classic checkers and Chinese checkers with cutting-edge blockchain technology.
+Our team integrated Dojo and Cartridge to develop a decentralized smart contract, ensuring secure and transparent gameplay. With Cartridge, we optimized the game session process—players only need to authorize once at the beginning, eliminating the need to manually sign every transaction. This creates a seamless, blockchain-integrated experience, allowing players to focus on strategy rather than technical details.
+
+Check this out: https://mammo-checkers.mammoblocks.io/
+
+Play, strategize, and step into a new era of decentralized board games on the blockchain! 🚀
 
 # Prerequisites
 
