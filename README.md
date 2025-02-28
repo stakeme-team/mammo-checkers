@@ -18,8 +18,7 @@ Additionally, you need to install the following components:
     ```
     
 2. **Slot**  
-    Run the following command:
-    
+
     ```bash
     curl -L https://slot.cartridge.sh | bash
     slotup
