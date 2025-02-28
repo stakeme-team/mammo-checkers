@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const CHECK_PLAYER1_MATCHES = gql`
 	query MyCheckersGameMatchModels($player: String!) {
-		myCheckersGameMatchModels(where: { player1: $player }, first: 1) {
+		myCheckersGameMatchModels(where: { player1: $player }, limit: 1) {
 			edges {
 				node {
 					match_id
