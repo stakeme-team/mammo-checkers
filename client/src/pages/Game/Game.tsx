@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import { MoveMadeSubscription } from "../../components/EventsSubscription";
@@ -40,6 +40,7 @@ export const Game = () => {
 
 	const {
 		unityProvider,
+		loadingProgression,
 		isLoaded,
 		sendMessage,
 		addEventListener,
@@ -221,34 +222,50 @@ export const Game = () => {
 					position: "relative",
 				}}
 			>
-				<Unity
-					unityProvider={unityProvider}
-					style={{
-						width: "610px",
-						height: "610px",
-						marginLeft: "25px",
-						borderRadius: "8px",
-						opacity: waitingTransaction ? "50%" : "100%",
-						pointerEvents: waitingTransaction ? "none" : "auto",
-					}}
-				/>
-				<MoveMadeSubscription
-					match_id={matchData?.match_id}
-					address={account.address}
-					sendMessage={sendMessage}
-				/>
-				{waitingTransaction && (
-					<p
+				<Fragment>
+					{!isLoaded && (
+						<p
+							style={{
+								position: "absolute",
+								top: "50%",
+								left: "50%",
+								transform: "translate(-50%, -50%)",
+							}}
+						>
+							Loading Application... {Math.round(loadingProgression * 100)}%
+						</p>
+					)}
+					<Unity
+						unityProvider={unityProvider}
 						style={{
-							position: "absolute",
-							top: "50%",
-							left: "50%",
-							transform: "translate(-50%, -50%)",
+							width: "610px",
+							height: "610px",
+							marginLeft: "25px",
+							borderRadius: "8px",
+							opacity: waitingTransaction ? "50%" : "100%",
+							pointerEvents: waitingTransaction ? "none" : "auto",
+							visibility: isLoaded ? "visible" : "hidden",
 						}}
-					>
-						Transaction is processing
-					</p>
-				)}
+					/>
+					<MoveMadeSubscription
+						match_id={matchData?.match_id}
+						address={account.address}
+						sendMessage={sendMessage}
+					/>
+					{waitingTransaction && (
+						<p
+							style={{
+								position: "absolute",
+								top: "50%",
+								left: "50%",
+								transform: "translate(-50%, -50%)",
+								fontSize: "20px",
+							}}
+						>
+							Transaction is processing
+						</p>
+					)}
+				</Fragment>
 			</div>
 			<WatchMatch
 				matchId={String(matchData?.match_id)}
