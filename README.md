@@ -18,7 +18,7 @@ Additionally, you need to install the following components:
     ```
     
 2. **Slot**  
-
+    
     ```bash
     curl -L https://slot.cartridge.sh | bash
     slotup
@@ -261,6 +261,28 @@ The client application actively uses GraphQL to fetch real-time data regarding m
     - **Cartridge:** Simplifies transaction confirmation and game session management, making blockchain interactions seamless and user-friendly.
 
 This structure ensures a robust and scalable system, enabling a complete gaming experience with minimal delays and a highly intuitive interface for users.
+
+### Unity Client (Directory: unity)
+
+The Unity serves as the interactive 2D game interface, built using C#. It communicates with the React client through WebGL messaging to exchange move information and synchronize game state updates.
+#### Key Components
+- **Board.cs:** 
+    Manages the primary game logic. It handles move validation, turn switching, and win conditions, ensuring that all actions comply with game rules. The script also interacts with WebRequests.cs to synchronize state changes.
+- **Piece.cs:** 
+    Responsible for the behavior of individual pieces. This includes movement logic, drag-and-drop functionality, and piece interactions.
+- **Player.cs:** 
+    Handles player-specific logic, including initializing game settings based on data received from the client. This script ensures that each player's settings (e.g., color, turn order) are correctly applied during gameplay.
+- **TextPopup.cs:** 
+    Displays pop-up messages to inform players of invalid moves or other game-related notifications. This enhances user feedback and improves the overall gameplay experience.
+- **WebRequests.cs:** 
+    Manages interactions for retrieving and updating game state. This script ensures that moves are properly recorded and that the Unity client remains synchronized with the latest game data.
+#### Unity-to-React Communication
+The Unity client exchanges move data with the React client through WebGL messaging. This allows seamless coordination, where:
+    - Unity sends move updates to React for processing and validation.
+    - React sends initialization data to Unity, allowing it to set up the initial game state based on player information and current match conditions.
+
+---
+
 # HTTPS for Controller Operation
 
 For the controller to work correctly, you must use HTTPS. To do this, install `mkcert` and create a local certificate.
