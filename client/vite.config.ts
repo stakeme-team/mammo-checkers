@@ -11,7 +11,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     hmr: {
-      protocol: 'wss', // WebSocket Secure для HMR через Cloudflare
+      protocol: 'wss',
       host: 'mammo-checkers.mammoblocks.io',
     },
   },
