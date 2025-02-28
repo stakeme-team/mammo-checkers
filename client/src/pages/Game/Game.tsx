@@ -155,7 +155,7 @@ export const Game = () => {
 			sendMessage(
 				"Board",
 				"InitPlayer",
-				`${player},${current_turn},${match_id},${game_type}`
+				`${player},${current_turn},${match_id},${game_type},${import.meta.env.VITE_GRAPHQL_URL_HTTP}`
 			);
 		}
 	}, [isLoaded, matchData, sendMessage]);
