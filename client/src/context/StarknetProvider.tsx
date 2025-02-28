@@ -7,6 +7,7 @@ import { RpcProvider } from "starknet";
 import { SessionPolicies } from "@cartridge/controller";
 
 export const CONTRACT_ACTIONS = import.meta.env.VITE_CONTRACT_ACTIONS_ADDRESS;
+export const CONTRACT_QUEUE_SYSTEM = import.meta.env.VITE_QUEUE_SYSTEM_ADDRESS;
 
 const policies: SessionPolicies = {
 	contracts: {
@@ -15,6 +16,11 @@ const policies: SessionPolicies = {
 				{ name: "Move in checkers", entrypoint: "make_move" },
 				{ name: "Move in corner", entrypoint: "corner_make_moves" },
 				//{name: "Offer draw", entrypoint: "offer_draw"},
+			],
+		},
+		[CONTRACT_QUEUE_SYSTEM]: {
+			methods: [
+				{ name: "Join Queue", entrypoint: "join_queue" },
 			],
 		},
 	},
