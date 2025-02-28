@@ -15,15 +15,15 @@ const policies: SessionPolicies = {
 			methods: [
 				{ name: "Move in checkers", entrypoint: "make_move" },
 				{ name: "Move in corner", entrypoint: "corner_make_moves" },
-				{ name: "Offer draw", entrypoint: "offer_draw" },
+				//{ name: "Offer draw", entrypoint: "offer_draw" },
 			],
 		},
-		[CONTRACT_QUEUE_SYSTEM]: {
-			methods: [
-				{ name: "Join Queue", entrypoint: "join_queue" },
-				{ name: "Leave Queue", entrypoint: "leave_queue" },
-			],
-		},
+		// [CONTRACT_QUEUE_SYSTEM]: {
+		// 	methods: [
+		// 		{ name: "Join Queue", entrypoint: "join_queue" },
+		// 		{ name: "Leave Queue", entrypoint: "leave_queue" },
+		// 	],
+		// },
 	},
 };
 
