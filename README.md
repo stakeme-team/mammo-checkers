@@ -1,3 +1,7 @@
+![mammo-checkers](https://github.com/user-attachments/assets/dd08f4e6-5e77-495f-84e9-983cbc0131f0)
+MammoCheckers – A New Era of classic board games on Celestia 🎲✨
+
+> MammoCheckers is a decentralized board game created specifically for the Celestia Hackathon, combining the timeless appeal of classic checkers and Chinese checkers with cutting-edge blockchain technology.
 
 # Prerequisites
 
