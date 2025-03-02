@@ -9,6 +9,7 @@ import { CHECK_PLAYER1_MATCHES } from "../../graphql/checkPlayer1Matches";
 import { CHECK_QUEUE_QUERY } from "../../graphql/checkQueueQuery";
 import { DrawButton } from "../../components/DrawButton";
 import { ReactUnityEventParameter } from "react-unity-webgl/distribution/types/react-unity-event-parameters";
+import { lookupAddresses } from "@cartridge/controller";
 
 export const Game = () => {
 	const [matchData, setMatchData] = useState<{
@@ -20,7 +21,7 @@ export const Game = () => {
 	const [waitingTransaction, setWaitingTransaction] = useState<boolean>(false);
 	const { account } = useAccount();
 	const [opponentOfferedDraw, setOpponentOfferedDraw] = useState(false);
-
+	const [opponentName, setOpponentName] = useState<string>();
 	const { data: queueData } = useQuery(CHECK_QUEUE_QUERY, {
 		variables: { player: account?.address },
 		skip: !account?.address,
@@ -149,14 +150,22 @@ export const Game = () => {
 		handleMoveCornerPiece,
 	]);
 
+	async function getOpponentName(player: string) {
+		const addressMap = await lookupAddresses([player]);
+		const opponent = addressMap.get(player) || "Player";
+		setOpponentName(opponent);
+	}
 	useEffect(() => {
 		if (isLoaded && matchData) {
 			const { player, current_turn, match_id, game_type } = matchData;
 			sendMessage(
 				"Board",
 				"InitPlayer",
-				`${player},${current_turn},${match_id},${game_type},${import.meta.env.VITE_GRAPHQL_URL_HTTP}`
+				`${player},${current_turn},${match_id},${game_type},${
+					import.meta.env.VITE_GRAPHQL_URL_HTTP
+				}`
 			);
+			getOpponentName(account ? account.address : "");
 		}
 	}, [isLoaded, matchData, sendMessage]);
 
@@ -272,12 +281,17 @@ export const Game = () => {
 				playerNumber={matchData?.player}
 			/>
 
-			<DrawButton
-				matchId={matchData?.match_id}
-				playerNumber={matchData?.player}
-				opponentOfferedDraw={opponentOfferedDraw}
-				onOpponentOffer={() => setOpponentOfferedDraw(true)}
-			/>
+			<div>
+				{opponentName && (
+					<p style={{ margin: 0 }}>Your opponent is {opponentName}</p>
+				)}
+				<DrawButton
+					matchId={matchData?.match_id}
+					playerNumber={matchData?.player}
+					opponentOfferedDraw={opponentOfferedDraw}
+					onOpponentOffer={() => setOpponentOfferedDraw(true)}
+				/>
+			</div>
 		</div>
 	);
 };
